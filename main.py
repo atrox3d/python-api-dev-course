@@ -1,4 +1,12 @@
+from typing import Optional
 from fastapi import Body, FastAPI
+from pydantic import BaseModel
+
+class Post(BaseModel):
+    title: str
+    content: str
+    published: bool = True
+    rating: Optional[int] = None
 
 app = FastAPI()
 
@@ -12,12 +20,8 @@ def get_posts():
     return {'data': 'this is your post'}
 
 @app.post('/createpost')
-def create_post(
-                    payload:dict # =Body()
-                ):
-    print(f'{payload = }')
+def create_post(newpost: Post):
+    print(f'{newpost = }')
     return {
-        'message': {
-            'succesfully created': payload
-        }
+        'received': newpost
     }
