@@ -1,5 +1,6 @@
 annotated-types==0.7.0
 anyio==4.4.0
+-e git+https://github.com/atrox3d/atrox3d-project.git@6302e970a5eca7c1fc8dc22ffea08c2891a4cd32#egg=atrox3d
 certifi==2024.7.4
 click==8.1.7
 dnspython==2.6.1
