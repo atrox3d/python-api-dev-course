@@ -11,7 +11,7 @@ class Post(BaseModel):
     id: int = None
 
 class Posts(BaseModel):
-    posts: list = []
+    posts: list[Post] = []
     # count: int = 0
 
     def add(self, post:Post):
@@ -29,7 +29,7 @@ def root():
     return {"message": "welcome to my api"}
 
 @app.get('/posts')
-def get_posts() -> dict:
+def get_posts() -> dict: 
     return {'data': posts}
 
 @app.post('/posts')
@@ -39,3 +39,15 @@ def create_post(post: Post) -> dict:
     posts.add(post)
     return {'data': post}
 
+def find_post(id:int) -> Post|None:
+    for post in posts.posts:
+        if post.id == id:
+            return post
+
+@app.get('/posts/{id}')
+def get_post(id:int) -> Post|dict:
+    if (post := find_post(id)) is not None:
+        return post
+    else:
+        return {'data': f'id {id} not found'}
+    
