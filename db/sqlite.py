@@ -1,7 +1,6 @@
 from contextlib import closing
 import sqlite3
 from sqlite3 import Connection, Cursor
-from db import sql
 
 from models.post import Post, Posts
 
@@ -24,12 +23,20 @@ def setup_db(filepath:str, tablename:str) -> Connection:
 def drop_table(conn:Connection, tablename:str):
     with conn:
         with closing(conn.cursor()) as cur:
-            return cur.execute(sql.drop_table.format(tablename))
+            return cur.execute('DROP TABLE IF EXISTS {}'.format(tablename))
 
 def create_table(conn:Connection, tablename:str):
     with conn:
         with closing(conn.cursor()) as cur:
-            cur.execute(sql.create_table.format(tablename))
+            cur.execute('''
+                    CREATE TABLE {} (
+                        id INTEGER PRIMARY KEY,
+                        title VARCHAR(50) NOT NULL,
+                        content VARCHAR(500) NOT NULL,
+                        published INTEGER NOT_NULL,
+                        created_at TEXT NOT NULL
+                    )
+                '''.format(tablename))
 
 def execute_sql(conn:Connection, sql:str, **data) -> list:
     with conn:
