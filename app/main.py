@@ -4,12 +4,17 @@ from typing import Optional
 from fastapi import FastAPI, HTTPException, Response, status
 from pydantic import BaseModel
 from random import randrange
+from datetime import datetime as dt
+from sqlite3 import Connection, Cursor
+
+from db import db
 
 class Post(BaseModel):
     title: str
     content: str
     published: bool = True
     rating: Optional[int] = None
+    created_at: str
     id: int = None
 
 class Posts(BaseModel):
@@ -20,11 +25,25 @@ class Posts(BaseModel):
         self.posts.append(post)
         # self.count = len(self.posts)
 
-# posts = []
+def create_posts(conn:Connection, posts:Posts):
+    for post in posts.posts:
+        db.execute_sql(conn, '''
+            INSERT INTO posts
+            (title, content, published, created_at)
+            VALUES
+            (:title, :content, :published, :created_at)
+        ''', **post.model_dump())
+
 posts = Posts(posts=[
-    Post(title='defaul post 1', content='default content 1', id=1),
-    Post(title='defaul post 2', content='default content 2', id=2),
+    Post(title='defaul post 1', content='default content 1', id=1, 
+         created_at=dt.today().strftime('%Y-%m-%d %H:%M:%S')),
+    Post(title='defaul post 2', content='default content 2', id=2,
+         created_at=dt.today().strftime('%Y-%m-%d %H:%M:%S')),
 ])
+
+
+conn = db.setup_db('social.db', 'posts')
+create_posts(conn, posts)
 
 app = FastAPI()
 
