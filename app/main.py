@@ -1,4 +1,3 @@
-from turtle import up
 from typing import Optional
 # from fastapi import Body, FastAPI, HTTPException, Response, status
 from fastapi import FastAPI, HTTPException, Response, status
@@ -8,24 +7,9 @@ from datetime import datetime as dt
 from sqlite3 import Connection, Cursor
 
 from db import db
+from models.post import Post, Posts
 
-class Post(BaseModel):
-    title: str
-    content: str
-    published: bool = True
-    rating: Optional[int] = None
-    created_at: str
-    id: int = None
-
-class Posts(BaseModel):
-    posts: list[Post] = []
-    # count: int = 0
-
-    def add(self, post:Post):
-        self.posts.append(post)
-        # self.count = len(self.posts)
-
-def create_posts(conn:Connection, posts:Posts):
+def create_db_posts(conn:Connection, posts:Posts):
     for post in posts.posts:
         db.execute_sql(conn, '''
             INSERT INTO posts
@@ -33,6 +17,14 @@ def create_posts(conn:Connection, posts:Posts):
             VALUES
             (:title, :content, :published, :created_at)
         ''', **post.model_dump())
+
+def get_db_posts(conn:Connection) -> Posts:
+    conn.row_factory = db.dict_factory
+    rows = db.execute_sql(conn, '''
+        SELECT * FROM posts
+    ''')
+    posts = [Post(**row) for row in rows]
+    return Posts(posts=posts)
 
 posts = Posts(posts=[
     Post(title='defaul post 1', content='default content 1', id=1, 
@@ -43,7 +35,7 @@ posts = Posts(posts=[
 
 
 conn = db.setup_db('social.db', 'posts')
-create_posts(conn, posts)
+create_db_posts(conn, posts)
 
 app = FastAPI()
 
@@ -52,8 +44,8 @@ def root():
     return {"message": "welcome to my api"}
 
 @app.get('/posts')
-def get_posts() -> dict: 
-    return {'data': posts}
+def get_posts() -> Posts: 
+    return get_db_posts(conn)
 
 @app.post('/posts', status_code=status.HTTP_201_CREATED)
 def create_post(post: Post) -> dict:

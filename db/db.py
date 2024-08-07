@@ -10,7 +10,7 @@ def dict_factory(connection, row) -> dict:
     }
 
 def get_connection(file_path:str) -> Connection:
-    return sqlite3.connect(file_path)
+    return sqlite3.connect(file_path, check_same_thread=False)
 
 def setup_db(filepath:str, tablename:str) -> Connection:
     conn = get_connection(filepath)
@@ -18,18 +18,18 @@ def setup_db(filepath:str, tablename:str) -> Connection:
     create_table(conn, tablename)
     return conn
 
-def drop_table(conn:Connection, tablename:str) -> Cursor:
+def drop_table(conn:Connection, tablename:str):
     with conn:
         with closing(conn.cursor()) as cur:
             return cur.execute(sql.drop_table.format(tablename))
 
-def create_table(conn:Connection, tablename:str) -> Cursor:
+def create_table(conn:Connection, tablename:str):
     with conn:
         with closing(conn.cursor()) as cur:
             cur.execute(sql.create_table.format(tablename))
 
-def execute_sql(conn:Connection, sql:str, **data) -> Cursor:
+def execute_sql(conn:Connection, sql:str, **data) -> list:
     with conn:
         with closing(conn.cursor()) as cur:
-            return cur.execute(sql, data)
+            return cur.execute(sql, data).fetchall()
 
