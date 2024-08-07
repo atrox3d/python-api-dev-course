@@ -1,38 +1,9 @@
-from typing import Optional
-# from fastapi import Body, FastAPI, HTTPException, Response, status
 from fastapi import FastAPI, HTTPException, Response, status
-from pydantic import BaseModel
 from random import randrange
-from datetime import datetime as dt
-from sqlite3 import Connection, Cursor
 
 from db import db
 from models.post import Post, Posts
-
-def create_db_posts(conn:Connection, posts:Posts):
-    for post in posts.posts:
-        db.execute_sql(conn, '''
-            INSERT INTO posts
-            (title, content, published, created_at)
-            VALUES
-            (:title, :content, :published, :created_at)
-        ''', **post.model_dump())
-
-def get_db_posts(conn:Connection) -> Posts:
-    conn.row_factory = db.dict_factory
-    rows = db.execute_sql(conn, '''
-        SELECT * FROM posts
-    ''')
-    posts = [Post(**row) for row in rows]
-    return Posts(posts=posts)
-
-posts = Posts(posts=[
-    Post(title='defaul post 1', content='default content 1', id=1, 
-         created_at=dt.today().strftime('%Y-%m-%d %H:%M:%S')),
-    Post(title='defaul post 2', content='default content 2', id=2,
-         created_at=dt.today().strftime('%Y-%m-%d %H:%M:%S')),
-])
-
+from helpers.posts import create_db_posts, get_db_posts, posts
 
 conn = db.setup_db('social.db', 'posts')
 create_db_posts(conn, posts)
