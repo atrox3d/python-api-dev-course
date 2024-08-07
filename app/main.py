@@ -1,11 +1,11 @@
 from fastapi import FastAPI, HTTPException, Response, status
 from random import randrange
 
-from db import db
+from db import sqlite
 from models.post import Post, Posts
 from helpers.posts import create_db_posts, get_db_posts, posts
 
-conn = db.setup_db('social.db', 'posts')
+conn = sqlite.setup_db('social.db', 'posts')
 create_db_posts(conn, posts)
 
 app = FastAPI()

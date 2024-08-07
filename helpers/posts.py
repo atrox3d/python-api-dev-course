@@ -1,6 +1,6 @@
 from datetime import datetime as dt
 from sqlite3 import Connection
-from db import db
+from db import sqlite
 from models.post import Post, Posts
 
 
@@ -14,7 +14,7 @@ posts = Posts(posts=[
 
 def create_db_posts(conn:Connection, posts:Posts):
     for post in posts.posts:
-        db.execute_sql(conn, '''
+        sqlite.execute_sql(conn, '''
             INSERT INTO posts
             (title, content, published, created_at)
             VALUES
@@ -22,8 +22,8 @@ def create_db_posts(conn:Connection, posts:Posts):
         ''', **post.model_dump())
 
 def get_db_posts(conn:Connection) -> Posts:
-    conn.row_factory = db.dict_factory
-    rows = db.execute_sql(conn, '''
+    conn.row_factory = sqlite.dict_factory
+    rows = sqlite.execute_sql(conn, '''
         SELECT * FROM posts
     ''')
     posts = [Post(**row) for row in rows]
