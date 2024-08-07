@@ -1,3 +1,4 @@
+from turtle import up
 from typing import Optional
 # from fastapi import Body, FastAPI, HTTPException, Response, status
 from fastapi import FastAPI, HTTPException, Response, status
@@ -63,6 +64,15 @@ def get_post(
 def delete_post(id:int):
     if (post := find_post(id)) is not None:
         posts.posts.remove(post)
+    else:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, f'id {id} not found')
+
+@app.put('/posts/{id}')
+def update_post(id:int, update:Post):
+    if (post := find_post(id)) is not None:
+        post.title = update.title
+        post.content = update.content
+        return {'updated': post}
     else:
         raise HTTPException(status.HTTP_404_NOT_FOUND, f'id {id} not found')
     
