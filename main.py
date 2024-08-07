@@ -1,5 +1,6 @@
 from typing import Optional
-from fastapi import Body, FastAPI, HTTPException, Response, status
+# from fastapi import Body, FastAPI, HTTPException, Response, status
+from fastapi import FastAPI, HTTPException, Response, status
 from pydantic import BaseModel
 from random import randrange
 
@@ -18,11 +19,13 @@ class Posts(BaseModel):
         self.posts.append(post)
         # self.count = len(self.posts)
 
-posts = Posts()
+# posts = []
+posts = Posts(posts=[
+    Post(title='defaul post 1', content='default content 1', id=1),
+    Post(title='defaul post 2', content='default content 2', id=2),
+])
 
 app = FastAPI()
-
-# posts = []
 
 @app.get("/")
 def root():
@@ -54,5 +57,12 @@ def get_post(
     else:
         # response.status_code = status.HTTP_404_NOT_FOUND
         # return {'data': f'id {id} not found'}
+        raise HTTPException(status.HTTP_404_NOT_FOUND, f'id {id} not found')
+
+@app.delete('/posts/{id}', status_code=status.HTTP_204_NO_CONTENT)
+def delete_post(id:int):
+    if (post := find_post(id)) is not None:
+        posts.posts.remove(post)
+    else:
         raise HTTPException(status.HTTP_404_NOT_FOUND, f'id {id} not found')
     
