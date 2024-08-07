@@ -1,6 +1,4 @@
 from datetime import datetime as dt
-from sqlite3 import Connection
-from db import sqlite
 from models.post import Post, Posts
 
 
@@ -11,20 +9,3 @@ posts = Posts(posts=[
          created_at=dt.today().strftime('%Y-%m-%d %H:%M:%S')),
 ])
 
-
-def create_db_posts(conn:Connection, posts:Posts):
-    for post in posts.posts:
-        sqlite.execute_sql(conn, '''
-            INSERT INTO posts
-            (title, content, published, created_at)
-            VALUES
-            (:title, :content, :published, :created_at)
-        ''', **post.model_dump())
-
-def get_db_posts(conn:Connection) -> Posts:
-    conn.row_factory = sqlite.dict_factory
-    rows = sqlite.execute_sql(conn, '''
-        SELECT * FROM posts
-    ''')
-    posts = [Post(**row) for row in rows]
-    return Posts(posts=posts)

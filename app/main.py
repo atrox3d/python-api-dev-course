@@ -3,7 +3,8 @@ from random import randrange
 
 from db import sqlite
 from models.post import Post, Posts
-from helpers.posts import create_db_posts, get_db_posts, posts
+from db.sqlite import create_db_posts, get_db_posts
+from helpers.posts import posts
 
 conn = sqlite.setup_db('social.db', 'posts')
 create_db_posts(conn, posts)

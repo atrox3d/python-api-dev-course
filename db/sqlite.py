@@ -3,6 +3,9 @@ import sqlite3
 from sqlite3 import Connection, Cursor
 from db import sql
 
+from models.post import Post, Posts
+
+
 def dict_factory(connection, row) -> dict:
     return {
             col[0]: row[idx] 
@@ -33,3 +36,19 @@ def execute_sql(conn:Connection, sql:str, **data) -> list:
         with closing(conn.cursor()) as cur:
             return cur.execute(sql, data).fetchall()
 
+def create_db_posts(conn:Connection, posts:Posts):
+    for post in posts.posts:
+        execute_sql(conn, '''
+            INSERT INTO posts
+            (title, content, published, created_at)
+            VALUES
+            (:title, :content, :published, :created_at)
+        ''', **post.model_dump())
+
+def get_db_posts(conn:Connection) -> Posts:
+    conn.row_factory = dict_factory
+    rows = execute_sql(conn, '''
+        SELECT * FROM posts
+    ''')
+    posts = [Post(**row) for row in rows]
+    return Posts(posts=posts)
