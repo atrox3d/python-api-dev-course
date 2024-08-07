@@ -43,14 +43,17 @@ def execute_sql(conn:Connection, sql:str, **data) -> list:
         with closing(conn.cursor()) as cur:
             return cur.execute(sql, data).fetchall()
 
-def create_db_posts(conn:Connection, posts:Posts):
-    for post in posts.posts:
+def create_db_post(conn:Connection, post:Post):
         execute_sql(conn, '''
             INSERT INTO posts
             (title, content, published, created_at)
             VALUES
             (:title, :content, :published, :created_at)
         ''', **post.model_dump())
+
+def create_db_posts(conn:Connection, posts:Posts):
+    for post in posts.posts:
+        create_db_post(conn, post)
 
 def get_db_posts(conn:Connection) -> Posts:
     conn.row_factory = dict_factory
