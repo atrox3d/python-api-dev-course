@@ -1,13 +1,13 @@
 from fastapi import FastAPI, HTTPException, Response, status
 from random import randrange
 
-from db import sqlite
+from db import sqlite as db
 from models.post import Post, Posts
-from db.sqlite import create_db_posts, get_db_posts
+# from db.sqlite import create_db_posts, get_db_posts
 from helpers.posts import posts
 
-conn = sqlite.setup_db('social.db', 'posts')
-create_db_posts(conn, posts)
+conn = db.setup_db('social.db', 'posts')
+db.create_db_posts(conn, posts)
 
 app = FastAPI()
 
@@ -17,13 +17,11 @@ def root():
 
 @app.get('/posts')
 def get_posts() -> Posts: 
-    return get_db_posts(conn)
+    return db.get_db_posts(conn)
 
 @app.post('/posts', status_code=status.HTTP_201_CREATED)
 def create_post(post: Post) -> dict:
-    post.id = randrange(0, 1000000)
-    print(f'{post = }')
-    posts.add(post)
+    db.create_db_post(conn, post)
     return {'data': post}
 
 def find_post(id:int) -> Post|None:

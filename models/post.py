@@ -6,7 +6,7 @@ class Post(BaseModel):
     content: str
     published: bool = True
     rating: Optional[int] = None
-    created_at: str
+    created_at: str = None
     id: int = None
 
 class Posts(BaseModel):
