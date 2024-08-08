@@ -40,9 +40,12 @@ def create_table(conn:Connection, tablename:str):
                 '''.format(tablename))
 
 def execute_sql(conn:Connection, sql:str, **data) -> list:
+    # print(f'EXECUTE_SQL | {sql = }')
     with conn:
         with closing(conn.cursor()) as cur:
-            return cur.execute(sql, data).fetchall()
+            result = cur.execute(sql, data).fetchall()
+            # print(f'EXECUTE_SQL | fetchall {result = }')
+            return result
 
 def create_db_post(conn:Connection, post:Post):
         execute_sql(conn, '''
