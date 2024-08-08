@@ -45,7 +45,6 @@ def execute_sql(conn:Connection, sql:str, **data) -> list:
             return cur.execute(sql, data).fetchall()
 
 def create_db_post(conn:Connection, post:Post):
-        post.created_at = dt.today().strftime('%Y-%m-%d %H:%M:%S')
         execute_sql(conn, '''
             INSERT INTO posts
             (title, content, published, created_at)

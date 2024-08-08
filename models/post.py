@@ -1,12 +1,12 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional
-
+from datetime import datetime as dt
 class Post(BaseModel):
     title: str
     content: str
     published: bool = True
     rating: Optional[int] = None
-    created_at: str = None
+    created_at: str = Field(default_factory=lambda:dt.today().strftime('%Y-%m-%d %H:%M:%S'))
     id: int = None
 
 class Posts(BaseModel):
