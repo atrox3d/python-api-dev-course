@@ -4,10 +4,10 @@ from random import randrange
 from db import sqlite as db
 from models.post import Post, Posts
 # from db.sqlite import create_db_posts, get_db_posts
-from helpers.posts import posts
+from helpers.posts import default_posts
 
 conn = db.setup_db('social.db', 'posts')
-db.create_db_posts(conn, posts)
+db.create_db_posts(conn, default_posts)
 
 app = FastAPI()
 
@@ -25,7 +25,7 @@ def create_post(post: Post) -> dict:
     return {'data': post}
 
 def find_post(id:int) -> Post|None:
-    for post in posts.posts:
+    for post in default_posts.posts:
         if post.id == id:
             return post
 
@@ -33,8 +33,9 @@ def find_post(id:int) -> Post|None:
 def get_post(
                 id:int, 
                 # response: Response
-    ) -> Post|dict:
-    if (post := find_post(id)) is not None:
+    ) -> Post:
+    post = db.find_db_post(conn, id)
+    if post:
         return post
     else:
         # response.status_code = status.HTTP_404_NOT_FOUND
@@ -44,7 +45,7 @@ def get_post(
 @app.delete('/posts/{id}', status_code=status.HTTP_204_NO_CONTENT)
 def delete_post(id:int):
     if (post := find_post(id)) is not None:
-        posts.posts.remove(post)
+        default_posts.posts.remove(post)
     else:
         raise HTTPException(status.HTTP_404_NOT_FOUND, f'id {id} not found')
 

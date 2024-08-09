@@ -41,10 +41,13 @@ def create_table(conn:Connection, tablename:str):
 
 def execute_sql(conn:Connection, sql:str, **data) -> list:
     # print(f'EXECUTE_SQL | {sql = }')
-    with conn:
+    with conn: # commit
         with closing(conn.cursor()) as cur:
-            result = cur.execute(sql, data).fetchall()
-            # print(f'EXECUTE_SQL | fetchall {result = }')
+            # result = cur.execute(sql, data).fetchall()
+            # cur.execute() returns self
+            cur.execute(sql, data)
+            result = cur.fetchall()
+            print(f'EXECUTE_SQL | fetchall {result = }')
             return result
 
 def create_db_post(conn:Connection, post:Post):
@@ -66,3 +69,12 @@ def get_db_posts(conn:Connection) -> Posts:
     ''')
     posts = [Post(**row) for row in rows]
     return Posts(posts=posts)
+
+def find_db_post(conn:Connection, id:int) -> Post | None:
+    conn.row_factory = dict_factory
+    rows = execute_sql(conn, '''
+        SELECT * FROM posts
+        WHERE id = :id
+    ''', id=id)
+    if rows:
+        return Post(**rows[0])
