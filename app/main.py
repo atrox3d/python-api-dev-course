@@ -1,10 +1,15 @@
+from re import L
 from fastapi import FastAPI, HTTPException, Response, status
 from random import randrange
+import logging
 
 from db import sqlite as db
 from models.post import Post, Posts
 # from db.sqlite import create_db_posts, get_db_posts
 from helpers.posts import default_posts
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 conn = db.setup_db('social.db', 'posts')
 db.create_db_posts(conn, default_posts)
