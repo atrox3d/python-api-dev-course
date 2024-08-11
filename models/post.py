@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import datetime as dt
+
 class Post(BaseModel):
     title: str
     content: str
@@ -8,6 +9,7 @@ class Post(BaseModel):
     rating: Optional[int] = None
     created_at: str = Field(default_factory=lambda:dt.today().strftime('%Y-%m-%d %H:%M:%S'))
     id: int = None
+
 
 class Posts(BaseModel):
     posts: list[Post] = []

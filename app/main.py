@@ -49,19 +49,18 @@ def get_post(
 
 @app.delete('/posts/{id}', status_code=status.HTTP_204_NO_CONTENT)
 def delete_post(id:int):
-    # if (post := find_post(id)) is not None:
     if db.find_db_post(conn, id):
         db.delete_db_post(conn, id)
-    #     default_posts.posts.remove(post)
     else:
         raise HTTPException(status.HTTP_404_NOT_FOUND, f'id {id} not found')
 
 @app.put('/posts/{id}')
 def update_post(id:int, update:Post):
-    if (post := find_post(id)) is not None:
+    post = db.find_db_post(conn, id)
+    if post:
         post.title = update.title
         post.content = update.content
+        db.update_db_post(conn, id, post.model_dump())
         return {'updated': post}
     else:
         raise HTTPException(status.HTTP_404_NOT_FOUND, f'id {id} not found')
-    

@@ -106,5 +106,12 @@ def delete_db_post(conn:Connection, id:int) -> Post | None:
         DELETE FROM posts
         WHERE id = :id
     ''', id=id)
-    if rows:
-        return Post(**rows[0])
+
+@logged
+def update_db_post(conn:Connection, id:int, update:Post) -> Post | None:
+    conn.row_factory = dict_factory
+    rows = execute_sql(conn, '''
+        UPDATE posts
+        SET title = :title, content = :content
+        WHERE id = :id
+    ''', **update)
