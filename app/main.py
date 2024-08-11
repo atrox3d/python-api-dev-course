@@ -8,7 +8,7 @@ from models.post import Post, Posts
 # from db.sqlite import create_db_posts, get_db_posts
 from helpers.posts import default_posts
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 conn = db.setup_db('social.db', 'posts')
@@ -29,10 +29,10 @@ def create_post(post: Post) -> dict:
     db.create_db_post(conn, post)
     return {'data': post}
 
-def find_post(id:int) -> Post|None:
-    for post in default_posts.posts:
-        if post.id == id:
-            return post
+# def find_post(id:int) -> Post|None:
+#     for post in default_posts.posts:
+#         if post.id == id:
+#             return post
 
 @app.get('/posts/{id}')
 def get_post(
@@ -49,8 +49,10 @@ def get_post(
 
 @app.delete('/posts/{id}', status_code=status.HTTP_204_NO_CONTENT)
 def delete_post(id:int):
-    if (post := find_post(id)) is not None:
-        default_posts.posts.remove(post)
+    # if (post := find_post(id)) is not None:
+    if db.find_db_post(conn, id):
+        db.delete_db_post(conn, id)
+    #     default_posts.posts.remove(post)
     else:
         raise HTTPException(status.HTTP_404_NOT_FOUND, f'id {id} not found')
 

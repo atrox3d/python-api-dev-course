@@ -63,7 +63,7 @@ def execute_sql(conn:Connection, sql:str, **data) -> list:
             # cur.execute() returns self
             cur.execute(sql, data)
             result = cur.fetchall()
-            print(f'EXECUTE_SQL | fetchall {result = }')
+            # print(f'EXECUTE_SQL | fetchall {result = }')
             return result
 
 @logged
@@ -94,6 +94,16 @@ def find_db_post(conn:Connection, id:int) -> Post | None:
     conn.row_factory = dict_factory
     rows = execute_sql(conn, '''
         SELECT * FROM posts
+        WHERE id = :id
+    ''', id=id)
+    if rows:
+        return Post(**rows[0])
+
+@logged
+def delete_db_post(conn:Connection, id:int) -> Post | None:
+    conn.row_factory = dict_factory
+    rows = execute_sql(conn, '''
+        DELETE FROM posts
         WHERE id = :id
     ''', id=id)
     if rows:
