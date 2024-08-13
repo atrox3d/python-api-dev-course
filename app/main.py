@@ -5,7 +5,6 @@ import logging
 
 from db import sqlite as db
 from models.post import Post, Posts
-# from db.sqlite import create_db_posts, get_db_posts
 from helpers.posts import default_posts
 
 logging.basicConfig(level=logging.INFO)
@@ -28,11 +27,6 @@ def get_posts() -> Posts:
 def create_post(post: Post) -> dict:
     db.create_db_post(conn, post)
     return {'data': post}
-
-# def find_post(id:int) -> Post|None:
-#     for post in default_posts.posts:
-#         if post.id == id:
-#             return post
 
 @app.get('/posts/{id}')
 def get_post(
