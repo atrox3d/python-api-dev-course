@@ -1,24 +1,33 @@
-from re import L
-from fastapi import FastAPI, HTTPException, Response, status
+from fastapi import FastAPI, HTTPException, Response, status, Depends
 from random import randrange
 import logging
+
+from sqlalchemy.orm import Session
 
 from db import sqlite as db
 from models.post import Post, Posts
 from helpers.posts import default_posts
 
-from orm.sqlite import engine, SessionLocal, Base
+from orm.sqlite import engine, SessionLocal, Base, get_db
+from orm import models
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 SQLALCHEMY = True
 
-if not SQLALCHEMY:
+app = FastAPI()
+
+if SQLALCHEMY:
+    models.Base.metadata.create_all(bind=engine)
+
+    @app .get('/sqlalchemy')
+    def test_sql_alchemy(db: Session = Depends(get_db)):
+        return {'status': 'success'}
+    
+else:
     conn = db.setup_db('social.db', 'posts')
     db.create_db_posts(conn, default_posts)
-
-app = FastAPI()
 
 @app.get("/")
 def root():
