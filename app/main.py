@@ -7,11 +7,16 @@ from db import sqlite as db
 from models.post import Post, Posts
 from helpers.posts import default_posts
 
+from orm.sqlite import engine, SessionLocal, Base
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-conn = db.setup_db('social.db', 'posts')
-db.create_db_posts(conn, default_posts)
+SQLALCHEMY = True
+
+if not SQLALCHEMY:
+    conn = db.setup_db('social.db', 'posts')
+    db.create_db_posts(conn, default_posts)
 
 app = FastAPI()
 
