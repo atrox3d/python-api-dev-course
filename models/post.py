@@ -10,7 +10,7 @@ class Post(BaseModel):
     # created_at: str = Field(default_factory=lambda:dt.today().strftime('%Y-%m-%d %H:%M:%S'))
     created_at: dt = Field(default_factory=lambda:dt.today())
     # created_at: dt
-    id: int = None
+    # id: int = None
 
 
 class Posts(BaseModel):

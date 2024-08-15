@@ -93,12 +93,22 @@ def delete_post(id:int, db: Session = Depends(get_db)):
         raise HTTPException(status.HTTP_404_NOT_FOUND, f'id {id} not found')
 
 @app.put('/posts/{id}')
-def update_post(id:int, update:Post):
-    post = db.find_db_post(conn, id)
+def update_post(id:int, update:Post, db: Session = Depends(get_db)):
+    # post = db.find_db_post(conn, id)
+    query = db.query(models.Post).filter(models.Post.id == id)
+    post = query.first()
     if post:
         post.title = update.title
         post.content = update.content
-        db.update_db_post(conn, id, post.model_dump())
+        # db.update_db_post(conn, id, post.model_dump())
+        print(update.model_dump())
+        query.update(
+                update.model_dump()
+                # {'title': 'updated', 'content': 'updated'}
+            )
+        db.commit()
+        db.refresh(post)
         return {'updated': post}
+        return
     else:
         raise HTTPException(status.HTTP_404_NOT_FOUND, f'id {id} not found')
