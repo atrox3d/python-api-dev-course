@@ -39,14 +39,20 @@ def root():
     return {"message": "welcome to my api"}
 
 @app.get('/posts')
-def get_posts(db: Session = Depends(get_db)): 
+def get_posts(db: Session = Depends(get_db)):   # -> ????
     # return db.get_db_posts(conn)
     return db.query(models.Post).all()
 
 @app.post('/posts', status_code=status.HTTP_201_CREATED)
-def create_post(post: Post) -> dict:
-    db.create_db_post(conn, post)
-    return {'data': post}
+def create_post(post: Post, db: Session = Depends(get_db)):
+    # db.create_db_post(conn, post)
+    new_post = models.Post(
+        **post.model_dump()
+    )
+    db.add(new_post)
+    db.commit()
+    db.refresh(new_post)
+    return {'data': new_post}
 
 @app.get('/posts/{id}')
 def get_post(
