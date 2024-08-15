@@ -23,6 +23,14 @@ app = FastAPI()
 if SQLALCHEMY:
     models.Base.metadata.create_all(bind=engine)
 
+    _db = SessionLocal()
+    for post in default_posts.posts:
+        print(f'adding {post}')
+        new_post = models.Post(**post.model_dump())
+        _db.add(new_post)
+        _db.commit()
+    _db.close()
+    
     @app .get('/sqlalchemy')
     def test_sql_alchemy(db: Session = Depends(get_db)):
         query = db.query(models.Post)
