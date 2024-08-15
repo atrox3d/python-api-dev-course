@@ -70,7 +70,10 @@ def get_post(
                 db: Session = Depends(get_db)
     ) -> Post:
     # post = db.find_db_post(conn, id)
-    post = db.query(models.Post).filter(models.Post.id == id)
+    print('retrieving post')
+    query = db.query(models.Post).filter(models.Post.id == id)
+    print(query)
+    post = query.first()
     if post:
         return post
     else:
