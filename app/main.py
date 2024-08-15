@@ -4,10 +4,12 @@ import logging
 
 from sqlalchemy.orm import Session
 
+# sqlite
 from db import sqlite as db
 from models.post import Post, Posts
 from helpers.posts import default_posts
 
+# sqlalchemy
 from orm.sqlite import engine, SessionLocal, Base, get_db
 from orm import models
 
@@ -37,8 +39,9 @@ def root():
     return {"message": "welcome to my api"}
 
 @app.get('/posts')
-def get_posts() -> Posts: 
-    return db.get_db_posts(conn)
+def get_posts(db: Session = Depends(get_db)): 
+    # return db.get_db_posts(conn)
+    return db.query(models.Post).all()
 
 @app.post('/posts', status_code=status.HTTP_201_CREATED)
 def create_post(post: Post) -> dict:
