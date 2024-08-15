@@ -23,7 +23,10 @@ if SQLALCHEMY:
 
     @app .get('/sqlalchemy')
     def test_sql_alchemy(db: Session = Depends(get_db)):
-        return {'status': 'success'}
+        query = db.query(models.Post)
+        print(query)
+        posts = query.all()
+        return {'query': str(query), 'data': posts}
     
 else:
     conn = db.setup_db('social.db', 'posts')
