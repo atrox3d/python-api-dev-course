@@ -72,7 +72,6 @@ def get_post(
     # post = db.find_db_post(conn, id)
     print('retrieving post')
     query = db.query(models.Post).filter(models.Post.id == id)
-    print(query)
     post = query.first()
     if post:
         return post
@@ -82,9 +81,14 @@ def get_post(
         raise HTTPException(status.HTTP_404_NOT_FOUND, f'id {id} not found')
 
 @app.delete('/posts/{id}', status_code=status.HTTP_204_NO_CONTENT)
-def delete_post(id:int):
-    if db.find_db_post(conn, id):
-        db.delete_db_post(conn, id)
+def delete_post(id:int, db: Session = Depends(get_db)):
+
+    # if db.find_db_post(conn, id):
+        # db.delete_db_post(conn, id)
+    query = db.query(models.Post).filter(models.Post.id == id)
+    if query.first():
+        query.delete()
+        db.commit()
     else:
         raise HTTPException(status.HTTP_404_NOT_FOUND, f'id {id} not found')
 
