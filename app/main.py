@@ -24,6 +24,7 @@ if SQLALCHEMY:
     models.Base.metadata.create_all(bind=engine)
 
     _db = SessionLocal()
+    _db.query(models.Post).delete()
     for post in default_posts.posts:
         print(f'adding {post}')
         new_post = models.Post(**post.model_dump())
@@ -66,8 +67,10 @@ def create_post(post: Post, db: Session = Depends(get_db)):
 def get_post(
                 id:int, 
                 # response: Response
+                db: Session = Depends(get_db)
     ) -> Post:
-    post = db.find_db_post(conn, id)
+    # post = db.find_db_post(conn, id)
+    post = db.query(models.Post).filter(models.Post.id == id)
     if post:
         return post
     else:
