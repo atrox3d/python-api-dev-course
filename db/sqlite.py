@@ -4,8 +4,10 @@ from sqlite3 import Connection, Cursor
 from datetime import datetime as dt
 import logging
 
+import schemas
+
 # from schemas.schemas import Post, Posts
-from schemas import Post, Posts
+# from schemas import Post, Posts
 
 logger = logging.getLogger(__name__)
 
@@ -68,7 +70,7 @@ def execute_sql(conn:Connection, sql:str, **data) -> list:
             return result
 
 @logged
-def create_db_post(conn:Connection, post:Post):
+def create_db_post(conn:Connection, post:schemas.PostCreate):
         execute_sql(conn, '''
             INSERT INTO posts
             (title, content, published, created_at)
@@ -77,12 +79,12 @@ def create_db_post(conn:Connection, post:Post):
         ''', **post.model_dump())
 
 @logged
-def create_db_posts(conn:Connection, posts:Posts):
+def create_db_posts(conn:Connection, posts:schemas.PostCreate):
     for post in posts.posts:
         create_db_post(conn, post)
 
 @logged
-def get_db_posts(conn:Connection) -> Posts:
+def get_db_posts(conn:Connection) -> schemas.PostBase:
     conn.row_factory = dict_factory
     rows = execute_sql(conn, '''
         SELECT * FROM posts
@@ -91,17 +93,17 @@ def get_db_posts(conn:Connection) -> Posts:
     return Posts(posts=posts)
 
 @logged
-def find_db_post(conn:Connection, id:int) -> Post | None:
+def find_db_post(conn:Connection, id:int) -> schemas.PostBase | None:
     conn.row_factory = dict_factory
     rows = execute_sql(conn, '''
         SELECT * FROM posts
         WHERE id = :id
     ''', id=id)
     if rows:
-        return Post(**rows[0])
+        return schemas.PostBase(**rows[0])
 
 @logged
-def delete_db_post(conn:Connection, id:int) -> Post | None:
+def delete_db_post(conn:Connection, id:int) -> schemas.PostBase | None:
     conn.row_factory = dict_factory
     rows = execute_sql(conn, '''
         DELETE FROM posts
@@ -109,7 +111,7 @@ def delete_db_post(conn:Connection, id:int) -> Post | None:
     ''', id=id)
 
 @logged
-def update_db_post(conn:Connection, id:int, update:Post) -> Post | None:
+def update_db_post(conn:Connection, id:int, update:schemas.PostCreate) -> schemas.PostBase | None:
     conn.row_factory = dict_factory
     rows = execute_sql(conn, '''
         UPDATE posts

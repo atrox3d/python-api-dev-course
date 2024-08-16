@@ -11,7 +11,9 @@ import schemas
 from helpers.posts import default_posts
 
 # sqlalchemy
-from orm.sqlite import engine, SessionLocal, Base, get_db
+from orm.sqlite import (
+    engine, SessionLocal, Base, get_db, reset_db
+    )
 from orm import models
 
 logging.basicConfig(level=logging.INFO)
@@ -24,15 +26,7 @@ app = FastAPI()
 if SQLALCHEMY:
     models.Base.metadata.create_all(bind=engine)
 
-    _db = SessionLocal()
-    print('MAIN| deleting all  posts')
-    _db.query(models.Post).delete()
-    for post in default_posts:
-        print(f'MAIN| adding {post}')
-        new_post = models.Post(**post.model_dump())
-        _db.add(new_post)
-        _db.commit()
-    _db.close()
+    reset_db(models, default_posts)
     
     @app .get('/sqlalchemy')
     def test_sql_alchemy(db: Session = Depends(get_db)) -> dict[str, str|schemas.Posts]:
@@ -50,12 +44,17 @@ def root() -> dict[str, str]:
     return {"message": "welcome to my api"}
 
 @app.get('/posts')
-def get_posts(db: Session = Depends(get_db)) -> schemas.Posts:   # -> ????
+def get_posts(
+                db: Session = Depends(get_db)
+) -> schemas.Posts:
     # return db.get_db_posts(conn)
     return db.query(models.Post).all()
 
 @app.post('/posts', status_code=status.HTTP_201_CREATED)
-def create_post(post: schemas.Post, db: Session = Depends(get_db)) -> dict[str, schemas.Post]:
+def create_post(
+                    post: schemas.PostCreate, 
+                    db: Session = Depends(get_db)
+) -> dict[str, schemas.PostBase]:
     # db.create_db_post(conn, post)
     new_post = models.Post(
         **post.model_dump()
@@ -70,7 +69,7 @@ def get_post(
                 id:int, 
                 # response: Response
                 db: Session = Depends(get_db)
-    ) -> schemas.Post:
+) -> schemas.PostBase:
     # post = db.find_db_post(conn, id)
     print('retrieving post')
     query = db.query(models.Post).filter(models.Post.id == id)
@@ -83,8 +82,10 @@ def get_post(
         raise HTTPException(status.HTTP_404_NOT_FOUND, f'id {id} not found')
 
 @app.delete('/posts/{id}', status_code=status.HTTP_204_NO_CONTENT)
-def delete_post(id:int, db: Session = Depends(get_db)):
-
+def delete_post(
+                    id:int, 
+                    db: Session = Depends(get_db)
+):
     # if db.find_db_post(conn, id):
         # db.delete_db_post(conn, id)
     query = db.query(models.Post).filter(models.Post.id == id)
@@ -95,7 +96,11 @@ def delete_post(id:int, db: Session = Depends(get_db)):
         raise HTTPException(status.HTTP_404_NOT_FOUND, f'id {id} not found')
 
 @app.put('/posts/{id}')
-def update_post(id:int, update:schemas.Post, db: Session = Depends(get_db)) -> dict[str, schemas.Post]:
+def update_post(
+                    id:int, 
+                    update:schemas.PostCreate, 
+                    db: Session = Depends(get_db)
+) -> dict[str, schemas.PostBase]:
     # post = db.find_db_post(conn, id)
     query = db.query(models.Post).filter(models.Post.id == id)
     post = query.first()

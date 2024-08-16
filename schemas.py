@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import datetime as dt
 
-class Post(BaseModel):
+class PostBase(BaseModel):
     title: str
     content: str
     published: bool = True
@@ -13,12 +13,6 @@ class Post(BaseModel):
     # created_at: dt
     # id: int = None
 
+class PostCreate(PostBase): pass
 
-# class Posts(BaseModel):
-#     posts: list[Post] = []
-#     # count: int = 0
-
-#     def add(self, post:Post):
-#         self.posts.append(post)
-#         # self.count = len(self.posts)
-Posts = list[Post]
+Posts = list[PostBase]
