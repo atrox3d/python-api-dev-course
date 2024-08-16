@@ -15,4 +15,11 @@ class PostBase(BaseModel):
 
 class PostCreate(PostBase): pass
 
-Posts = list[PostBase]
+class Post(PostBase):
+    id: int
+    created_at: dt
+
+    # class Config:
+        # orm_mode = True
+
+Posts = list[Post]

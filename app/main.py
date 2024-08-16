@@ -44,18 +44,25 @@ else:
 def root() -> dict[str, str]:
     return {"message": "welcome to my api"}
 
-@app.get('/posts')
+@app.get(
+        '/posts',
+         response_model=schemas.Posts
+)
 def get_posts(
                 db: Session = Depends(get_db)
 ) -> schemas.Posts:
     # return db.get_db_posts(conn)
     return db.query(models.Post).all()
 
-@app.post('/posts', status_code=status.HTTP_201_CREATED)
+@app.post('/posts', 
+          status_code=status.HTTP_201_CREATED,
+          response_model=schemas.Post
+)
 def create_post(
                     post: schemas.PostCreate, 
                     db: Session = Depends(get_db)
-) -> schemas.PostBase:
+):
+# ) -> schemas.Post:
     # db.create_db_post(conn, post)
     new_post = models.Post(
         **post.model_dump()
@@ -65,12 +72,15 @@ def create_post(
     db.refresh(new_post)
     return new_post
 
-@app.get('/posts/{id}')
+@app.get(
+          '/posts/{id}',
+          response_model=schemas.Post
+)
 def get_post(
                 id:int, 
                 # response: Response
                 db: Session = Depends(get_db)
-) -> schemas.PostBase:
+) -> schemas.Post:
     # post = db.find_db_post(conn, id)
     print('retrieving post')
     query = db.query(models.Post).filter(models.Post.id == id)
@@ -96,7 +106,10 @@ def delete_post(
     else:
         raise HTTPException(status.HTTP_404_NOT_FOUND, f'id {id} not found')
 
-@app.put('/posts/{id}')
+@app.put(
+        '/posts/{id}',
+        response_model=schemas.Post # precedence over hint
+)
 def update_post(
                     id:int, 
                     update:schemas.PostCreate, 
