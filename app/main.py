@@ -3,8 +3,8 @@ from fastapi import FastAPI, HTTPException, Response, status, Depends
 from random import randrange
 import logging
 from sqlalchemy.orm import Session
-from passlib.context import CryptContext
 
+import utils
 # sqlite
 from db import sqlite as db
 # from schemas.post import Post, Posts
@@ -25,7 +25,6 @@ logger = logging.getLogger(__name__)
 SQLALCHEMY = True
 
 app = FastAPI()
-pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 
 
 if SQLALCHEMY:
@@ -155,7 +154,7 @@ def create_user(
                     db: Session = Depends(get_db)
 # ):
 ) -> schemas.UserOut:
-    user.password = pwd_context.hash(user.password)
+    user.password = utils.hash(user.password)
 
     new_user = models.User(
         **user.model_dump()
