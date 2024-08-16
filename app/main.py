@@ -24,9 +24,10 @@ if SQLALCHEMY:
     models.Base.metadata.create_all(bind=engine)
 
     _db = SessionLocal()
+    print('MAIN| deleting all  posts')
     _db.query(models.Post).delete()
     for post in default_posts.posts:
-        print(f'adding {post}')
+        print(f'MAIN| adding {post}')
         new_post = models.Post(**post.model_dump())
         _db.add(new_post)
         _db.commit()
