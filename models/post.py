@@ -14,10 +14,11 @@ class Post(BaseModel):
     # id: int = None
 
 
-class Posts(BaseModel):
-    posts: list[Post] = []
-    # count: int = 0
+# class Posts(BaseModel):
+#     posts: list[Post] = []
+#     # count: int = 0
 
-    def add(self, post:Post):
-        self.posts.append(post)
-        # self.count = len(self.posts)
+#     def add(self, post:Post):
+#         self.posts.append(post)
+#         # self.count = len(self.posts)
+Posts = list[Post]

@@ -26,7 +26,7 @@ if SQLALCHEMY:
     _db = SessionLocal()
     print('MAIN| deleting all  posts')
     _db.query(models.Post).delete()
-    for post in default_posts.posts:
+    for post in default_posts:
         print(f'MAIN| adding {post}')
         new_post = models.Post(**post.model_dump())
         _db.add(new_post)
@@ -34,7 +34,7 @@ if SQLALCHEMY:
     _db.close()
     
     @app .get('/sqlalchemy')
-    def test_sql_alchemy(db: Session = Depends(get_db)):
+    def test_sql_alchemy(db: Session = Depends(get_db)) -> dict[str, str|Posts]:
         query = db.query(models.Post)
         print(query)
         posts = query.all()
@@ -45,16 +45,16 @@ else:
     db.create_db_posts(conn, default_posts)
 
 @app.get("/")
-def root():
+def root() -> dict[str, str]:
     return {"message": "welcome to my api"}
 
 @app.get('/posts')
-def get_posts(db: Session = Depends(get_db)):   # -> ????
+def get_posts(db: Session = Depends(get_db)) -> Posts:   # -> ????
     # return db.get_db_posts(conn)
     return db.query(models.Post).all()
 
 @app.post('/posts', status_code=status.HTTP_201_CREATED)
-def create_post(post: Post, db: Session = Depends(get_db)):
+def create_post(post: Post, db: Session = Depends(get_db)) -> dict[str, Post]:
     # db.create_db_post(conn, post)
     new_post = models.Post(
         **post.model_dump()
@@ -94,7 +94,7 @@ def delete_post(id:int, db: Session = Depends(get_db)):
         raise HTTPException(status.HTTP_404_NOT_FOUND, f'id {id} not found')
 
 @app.put('/posts/{id}')
-def update_post(id:int, update:Post, db: Session = Depends(get_db)):
+def update_post(id:int, update:Post, db: Session = Depends(get_db)) -> dict[str, Post]:
     # post = db.find_db_post(conn, id)
     query = db.query(models.Post).filter(models.Post.id == id)
     post = query.first()
@@ -110,6 +110,5 @@ def update_post(id:int, update:Post, db: Session = Depends(get_db)):
         db.commit()
         db.refresh(post)
         return {'updated': post}
-        return
     else:
         raise HTTPException(status.HTTP_404_NOT_FOUND, f'id {id} not found')
