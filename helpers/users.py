@@ -1,8 +1,8 @@
 from datetime import datetime as dt
-from schemas import User, Users
+from schemas import UserCreate, Users
 
 
 default_users: Users = [
-    User(email='fab@gmail.com', password='meow'),
+    UserCreate(email='fab@gmail.com', password='meow'),
 ]
 

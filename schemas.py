@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, EmailStr
 from typing import Optional
 from datetime import datetime as dt
 
@@ -24,8 +24,13 @@ class Post(PostBase):
 
 Posts = list[Post]
 
-class User(BaseModel):
-    email: str
+class UserCreate(BaseModel):
+    email: EmailStr
     password: str
 
-Users = list[User]
+class UserOut(BaseModel):
+    id: int
+    email: EmailStr
+    created_at: dt
+
+Users = list[UserCreate]
