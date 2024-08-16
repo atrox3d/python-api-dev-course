@@ -9,6 +9,7 @@ from db import sqlite as db
 # from schemas.post import Post, Posts
 import schemas
 from helpers.posts import default_posts
+from helpers.users import default_users
 
 # sqlalchemy
 from orm.sqlite import (
@@ -27,8 +28,11 @@ app = FastAPI()
 if SQLALCHEMY:
     models.Base.metadata.create_all(bind=engine)
 
-    reset_db(models, default_posts,
-            #  True
+    reset_db(
+                models,
+                default_posts,
+                default_users,
+                #  True
              )
     
     @app .get('/sqlalchemy')

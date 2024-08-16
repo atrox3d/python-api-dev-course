@@ -3,7 +3,7 @@ from schemas import PostBase, Posts
 
 
 default_posts: Posts = [
-    PostBase(title='default post 1', content='default content 1', id=1),
-    PostBase(title='default post 2', content='default content 2', id=2)
+    PostBase(title='default post 1', content='default content 1'),
+    PostBase(title='default post 2', content='default content 2')
 ]
 

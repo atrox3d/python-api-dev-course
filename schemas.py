@@ -23,3 +23,9 @@ class Post(PostBase):
         # orm_mode = True
 
 Posts = list[Post]
+
+class User(BaseModel):
+    email: str
+    password: str
+
+Users = list[User]
