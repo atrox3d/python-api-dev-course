@@ -27,7 +27,9 @@ app = FastAPI()
 if SQLALCHEMY:
     models.Base.metadata.create_all(bind=engine)
 
-    reset_db(models, default_posts)
+    reset_db(models, default_posts,
+            #  True
+             )
     
     @app .get('/sqlalchemy')
     def test_sql_alchemy(db: Session = Depends(get_db)) -> dict[str, str|schemas.Posts]:

@@ -5,6 +5,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
+import schemas
 
 SQLALCHEMY_DATABASE_URL = "sqlite:///social.db"
 # SQLALCHEMY_DATABASE_URL = "postgresql://user:password@postgresserver/db"
@@ -24,9 +25,23 @@ def get_db():
     finally:
         db.close()
 
-import schemas
-def reset_db(models:ModuleType, default_posts:schemas.Posts):
+def reset_db(
+                models:ModuleType, 
+                default_posts:schemas.Posts,
+                drop_tables:bool=False
+):
     _db = SessionLocal()
+
+    if drop_tables:
+        print('MAIN| dropping table posts')
+        models.User.__table__.drop(engine)
+        models.Post.__table__.drop(engine)
+        print('MAIN| dropping table users')
+        models.User.__table__.create(engine)
+        models.Post.__table__.create(engine)
+        _db.commit()
+
+    # return
     print('MAIN| deleting all  posts')
     _db.query(models.Post).delete()
     for post in default_posts:
