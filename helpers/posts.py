@@ -1,5 +1,5 @@
 from datetime import datetime as dt
-from models.post import Post, Posts
+from schemas import Post, Posts
 
 
 default_posts: Posts = [

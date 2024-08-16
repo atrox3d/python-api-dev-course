@@ -4,7 +4,8 @@ from sqlite3 import Connection, Cursor
 from datetime import datetime as dt
 import logging
 
-from models.post import Post, Posts
+# from schemas.schemas import Post, Posts
+from schemas import Post, Posts
 
 logger = logging.getLogger(__name__)
 

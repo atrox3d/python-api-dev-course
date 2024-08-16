@@ -6,7 +6,8 @@ from sqlalchemy.orm import Session
 
 # sqlite
 from db import sqlite as db
-from models.post import Post, Posts
+# from schemas.post import Post, Posts
+import schemas
 from helpers.posts import default_posts
 
 # sqlalchemy
@@ -34,7 +35,7 @@ if SQLALCHEMY:
     _db.close()
     
     @app .get('/sqlalchemy')
-    def test_sql_alchemy(db: Session = Depends(get_db)) -> dict[str, str|Posts]:
+    def test_sql_alchemy(db: Session = Depends(get_db)) -> dict[str, str|schemas.Posts]:
         query = db.query(models.Post)
         print(query)
         posts = query.all()
@@ -49,12 +50,12 @@ def root() -> dict[str, str]:
     return {"message": "welcome to my api"}
 
 @app.get('/posts')
-def get_posts(db: Session = Depends(get_db)) -> Posts:   # -> ????
+def get_posts(db: Session = Depends(get_db)) -> schemas.Posts:   # -> ????
     # return db.get_db_posts(conn)
     return db.query(models.Post).all()
 
 @app.post('/posts', status_code=status.HTTP_201_CREATED)
-def create_post(post: Post, db: Session = Depends(get_db)) -> dict[str, Post]:
+def create_post(post: schemas.Post, db: Session = Depends(get_db)) -> dict[str, schemas.Post]:
     # db.create_db_post(conn, post)
     new_post = models.Post(
         **post.model_dump()
@@ -69,7 +70,7 @@ def get_post(
                 id:int, 
                 # response: Response
                 db: Session = Depends(get_db)
-    ) -> Post:
+    ) -> schemas.Post:
     # post = db.find_db_post(conn, id)
     print('retrieving post')
     query = db.query(models.Post).filter(models.Post.id == id)
@@ -94,7 +95,7 @@ def delete_post(id:int, db: Session = Depends(get_db)):
         raise HTTPException(status.HTTP_404_NOT_FOUND, f'id {id} not found')
 
 @app.put('/posts/{id}')
-def update_post(id:int, update:Post, db: Session = Depends(get_db)) -> dict[str, Post]:
+def update_post(id:int, update:schemas.Post, db: Session = Depends(get_db)) -> dict[str, schemas.Post]:
     # post = db.find_db_post(conn, id)
     query = db.query(models.Post).filter(models.Post.id == id)
     post = query.first()
