@@ -13,7 +13,8 @@ from helpers.posts import default_posts
 # sqlalchemy
 from orm.sqlite import (
     engine, SessionLocal, Base, get_db, reset_db
-    )
+)
+
 from orm import models
 
 logging.basicConfig(level=logging.INFO)
@@ -54,7 +55,7 @@ def get_posts(
 def create_post(
                     post: schemas.PostCreate, 
                     db: Session = Depends(get_db)
-) -> dict[str, schemas.PostBase]:
+) -> schemas.PostBase:
     # db.create_db_post(conn, post)
     new_post = models.Post(
         **post.model_dump()
@@ -62,7 +63,7 @@ def create_post(
     db.add(new_post)
     db.commit()
     db.refresh(new_post)
-    return {'data': new_post}
+    return new_post
 
 @app.get('/posts/{id}')
 def get_post(
@@ -100,7 +101,7 @@ def update_post(
                     id:int, 
                     update:schemas.PostCreate, 
                     db: Session = Depends(get_db)
-) -> dict[str, schemas.PostBase]:
+) -> schemas.PostBase:
     # post = db.find_db_post(conn, id)
     query = db.query(models.Post).filter(models.Post.id == id)
     post = query.first()
@@ -115,6 +116,6 @@ def update_post(
             )
         db.commit()
         db.refresh(post)
-        return {'updated': post}
+        return post
     else:
         raise HTTPException(status.HTTP_404_NOT_FOUND, f'id {id} not found')
