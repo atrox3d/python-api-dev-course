@@ -89,8 +89,8 @@ def get_db_posts(conn:Connection) -> schemas.PostBase:
     rows = execute_sql(conn, '''
         SELECT * FROM posts
     ''')
-    posts = [Post(**row) for row in rows]
-    return Posts(posts=posts)
+    posts = [schemas.PostBase(**row) for row in rows]
+    return schemas.PostBase(posts=posts)
 
 @logged
 def find_db_post(conn:Connection, id:int) -> schemas.PostBase | None:
