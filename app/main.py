@@ -4,7 +4,6 @@ from random import randrange
 import logging
 from sqlalchemy.orm import Session
 
-import routers.posts
 import utils
 # sqlite
 from db import sqlite as db
@@ -19,8 +18,8 @@ from orm.sqlite import (
 )
 
 from orm import models
-import routers.posts
-import routers.users
+from .routers.posts import router as posts_router
+from .routers.users import router as users_router
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -28,8 +27,8 @@ logger = logging.getLogger(__name__)
 SQLALCHEMY = True
 
 app = FastAPI()
-app.include_router(routers.posts.router)
-app.include_router(routers.users.router)
+app.include_router(posts_router)
+app.include_router(users_router)
 
 
 if SQLALCHEMY:
