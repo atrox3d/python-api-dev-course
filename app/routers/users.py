@@ -1,26 +1,14 @@
-from typing_extensions import deprecated
-from fastapi import (
-    HTTPException, status, Depends, APIRouter
-)
-import logging
+from fastapi import HTTPException, status, Depends, APIRouter
 from sqlalchemy.orm import Session
+import logging
 
-import app.utils as utils
+from app import utils
 # sqlite
 from db.sqlite import sqlite as db
-# from schemas.post import Post, Posts
 import schemas
-# from helpers.posts import default_posts
-# from helpers.users import default_users
 
 # sqlalchemy
-from db.orm.sqlite import (
-    engine, 
-    SessionLocal, 
-    Base, 
-    get_db, 
-    reset_db
-)
+from db.orm.sqlite import get_db
 from db.orm import models
 
 router = APIRouter()
