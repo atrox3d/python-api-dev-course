@@ -10,7 +10,7 @@ import schemas
 from db.orm.sqlite import get_db
 from db.orm import models
 
-router = APIRouter(prefix='/posts')
+router = APIRouter(prefix='/posts', tags=['Posts'])
 
 @router.get(
         '/',
