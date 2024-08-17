@@ -19,7 +19,7 @@ except Exception as e:
     exit()
 
 # sqlite
-from db import sqlite as db
+from db.sqlite import sqlite as db
 from helpers.posts import default_posts
 from helpers.users import default_users
 

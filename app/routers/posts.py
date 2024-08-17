@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 
 # import app.utils as utils
 # sqlite
-from db import sqlite as db
+from db.sqlite import sqlite as db
 # from schemas.post import Post, Posts
 import schemas
 from helpers.posts import default_posts
