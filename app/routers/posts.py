@@ -14,10 +14,10 @@ from helpers.posts import default_posts
 from helpers.users import default_users
 
 # sqlalchemy
-from orm.sqlite import (
+from db.orm.sqlite import (
     engine, SessionLocal, Base, get_db, reset_db
 )
-from orm import models
+from db.orm import models
 
 router = APIRouter()
 
