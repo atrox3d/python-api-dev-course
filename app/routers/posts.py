@@ -6,11 +6,11 @@ from random import randrange
 import logging
 from sqlalchemy.orm import Session
 
-import utils as utils
+import app.utils as utils
 # sqlite
 from db import sqlite as db
 # from schemas.post import Post, Posts
-import schemas
+import app.schemas as schemas
 from helpers.posts import default_posts
 from helpers.users import default_users
 
