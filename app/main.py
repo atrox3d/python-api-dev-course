@@ -35,7 +35,7 @@ if SQLALCHEMY:
              )
 else:
     conn = db.setup_db('social.db', 'posts')
-    db.create_db_posts(conn, default_posts)
+    db.create_db_posts(conn, schemas.helpers.posts.default_posts)
 
 @app.get("/")
 def root() -> dict[str, str]:
