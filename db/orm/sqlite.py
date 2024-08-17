@@ -5,9 +5,10 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-import schemas
 import schemas.post
 import schemas.user
+
+import app.utils
 
 SQLALCHEMY_DATABASE_URL = "sqlite:///social.db"
 # SQLALCHEMY_DATABASE_URL = "postgresql://user:password@postgresserver/db"
@@ -56,6 +57,7 @@ def reset_db(
     _db.query(models.User).delete()
     for user in default_users:
         print(f'MAIN| adding {user}')
+        user.password = app.utils.hash(user.password)
         new_user = models.User(**user.model_dump())
         _db.add(new_user)
         _db.commit()

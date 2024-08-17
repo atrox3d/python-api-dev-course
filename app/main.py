@@ -10,7 +10,7 @@ import schemas
 # sqlalchemy
 from db.orm.sqlite import engine, reset_db
 from db.orm import models
-import schemas.helpers
+# import schemas.helpers
 import schemas.helpers.posts
 import schemas.helpers.users
 from .routers.posts import router as posts_router
