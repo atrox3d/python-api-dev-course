@@ -10,10 +10,10 @@ import schemas
 from db.orm.sqlite import get_db
 from db.orm import models
 
-router = APIRouter()
+router = APIRouter(prefix='/posts')
 
 @router.get(
-        '/posts',
+        '/',
          response_model=schemas.post.Posts
 )
 def get_posts(
@@ -22,7 +22,7 @@ def get_posts(
     # return db.get_db_posts(conn)
     return db.query(models.Post).all()
 
-@router.post('/posts', 
+@router.post('/',
           status_code=status.HTTP_201_CREATED,
           response_model=schemas.post.Post
 )
@@ -41,7 +41,7 @@ def create_post(
     return new_post
 
 @router.get(
-          '/posts/{id}',
+          '/{id}',
           response_model=schemas.post.Post
 )
 def get_post(
@@ -60,7 +60,7 @@ def get_post(
         # return {'data': f'id {id} not found'}
         raise HTTPException(status.HTTP_404_NOT_FOUND, f'id {id} not found')
 
-@router.delete('/posts/{id}', status_code=status.HTTP_204_NO_CONTENT)
+@router.delete('/{id}', status_code=status.HTTP_204_NO_CONTENT)
 def delete_post(
                     id:int, 
                     db: Session = Depends(get_db)
@@ -75,7 +75,7 @@ def delete_post(
         raise HTTPException(status.HTTP_404_NOT_FOUND, f'id {id} not found')
 
 @router.put(
-        '/posts/{id}',
+        '/{id}',
         response_model=schemas.post.Post # precedence over hint
 )
 def update_post(
