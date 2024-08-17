@@ -11,3 +11,7 @@ class UserOut(BaseModel):
     created_at: dt
 
 Users = list[UserCreate]
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str

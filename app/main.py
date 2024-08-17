@@ -13,15 +13,19 @@ from db.orm import models
 # import schemas.helpers
 import schemas.helpers.posts
 import schemas.helpers.users
-from .routers.posts import router as posts_router
-from .routers.users import router as users_router
+from .routers import posts
+from .routers import users
+from .routers import auth
+
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
-app.include_router(posts_router)
-app.include_router(users_router)
+app.include_router(posts.router)
+app.include_router(users.router)
+app.include_router(auth.router)
 
 SQLALCHEMY = True
 if SQLALCHEMY:
