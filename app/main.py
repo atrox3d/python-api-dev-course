@@ -1,14 +1,22 @@
-from typing_extensions import deprecated
 from fastapi import FastAPI, HTTPException, Response, status, Depends
 from random import randrange
 import logging
 from sqlalchemy.orm import Session
 
-import utils
+import sys
+print(f'{sys.path=}')
+print(f'{sys.argv=}')
+print(f'{__name__=}')
+exit()
+
+# import schemas
+from .. import schemas
+
+
+
 # sqlite
 from db import sqlite as db
 # from schemas.post import Post, Posts
-import schemas
 from helpers.posts import default_posts
 from helpers.users import default_users
 

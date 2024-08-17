@@ -6,7 +6,7 @@ from random import randrange
 import logging
 from sqlalchemy.orm import Session
 
-import utils
+import utils as utils
 # sqlite
 from db import sqlite as db
 # from schemas.post import Post, Posts
