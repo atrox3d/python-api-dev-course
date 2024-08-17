@@ -42,6 +42,14 @@ def reset_db(
         models.Post.__table__.create(engine)
         _db.commit()
 
+    print('MAIN| deleting all posts')
+    _db.query(models.Post).delete()
+    for post in default_posts:
+        print(f'MAIN| adding {post}')
+        new_post = models.Post(**post.model_dump())
+        _db.add(new_post)
+        _db.commit()
+
     print('MAIN| deleting all users')
     _db.query(models.User).delete()
     for user in default_users:
@@ -49,4 +57,5 @@ def reset_db(
         new_user = models.User(**user.model_dump())
         _db.add(new_user)
         _db.commit()
+
     _db.close()
