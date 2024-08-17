@@ -1,16 +1,15 @@
 from typing_extensions import deprecated
 from fastapi import (
-    FastAPI, HTTPException, Response, status, Depends, APIRouter
+    HTTPException, status, Depends, APIRouter
 )
-from random import randrange
 import logging
 from sqlalchemy.orm import Session
 
-import app.utils as utils
+# import app.utils as utils
 # sqlite
 from db import sqlite as db
 # from schemas.post import Post, Posts
-import app.schemas as schemas
+import schemas
 from helpers.posts import default_posts
 from helpers.users import default_users
 
@@ -24,23 +23,23 @@ router = APIRouter()
 
 @router.get(
         '/posts',
-         response_model=schemas.Posts
+         response_model=schemas.post.Posts
 )
 def get_posts(
                 db: Session = Depends(get_db)
-) -> schemas.Posts:
+) -> schemas.post.Posts:
     # return db.get_db_posts(conn)
     return db.query(models.Post).all()
 
 @router.post('/posts', 
           status_code=status.HTTP_201_CREATED,
-          response_model=schemas.Post
+          response_model=schemas.post.Post
 )
 def create_post(
-                    post: schemas.PostCreate, 
+                    post: schemas.post.PostCreate, 
                     db: Session = Depends(get_db)
 ):
-# ) -> schemas.Post:
+# ) -> schemas.post.Post:
     # db.create_db_post(conn, post)
     new_post = models.Post(
         **post.model_dump()
@@ -52,13 +51,13 @@ def create_post(
 
 @router.get(
           '/posts/{id}',
-          response_model=schemas.Post
+          response_model=schemas.post.Post
 )
 def get_post(
                 id:int, 
                 # response: Response
                 db: Session = Depends(get_db)
-) -> schemas.Post:
+) -> schemas.post.Post:
     # post = db.find_db_post(conn, id)
     print('retrieving post')
     query = db.query(models.Post).filter(models.Post.id == id)
@@ -86,13 +85,13 @@ def delete_post(
 
 @router.put(
         '/posts/{id}',
-        response_model=schemas.Post # precedence over hint
+        response_model=schemas.post.Post # precedence over hint
 )
 def update_post(
                     id:int, 
-                    update:schemas.PostCreate, 
+                    update:schemas.post.PostCreate, 
                     db: Session = Depends(get_db)
-) -> schemas.PostBase:
+) -> schemas.post.PostBase:
     # post = db.find_db_post(conn, id)
     query = db.query(models.Post).filter(models.Post.id == id)
     post = query.first()

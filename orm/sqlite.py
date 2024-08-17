@@ -5,7 +5,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-import app.schemas as schemas
+import schemas
 
 SQLALCHEMY_DATABASE_URL = "sqlite:///social.db"
 # SQLALCHEMY_DATABASE_URL = "postgresql://user:password@postgresserver/db"
@@ -27,8 +27,8 @@ def get_db():
 
 def reset_db(
                 models:ModuleType, 
-                default_posts:schemas.Posts,
-                default_users:schemas.Users,
+                default_posts:schemas.post.Posts,
+                default_users:schemas.user.Users,
                 drop_tables:bool=False
 ):
     _db = SessionLocal()

@@ -1,9 +1,5 @@
 from fastapi import (
     FastAPI, 
-    # HTTPException, 
-    # Response, 
-    # status, 
-    Depends
 )
 # from random import randrange
 import logging
@@ -12,7 +8,8 @@ from sqlalchemy.orm import Session
 
 # import schemas
 try:
-    from . import schemas
+    from schemas import post
+    # from ..schemas.post import Post
 except Exception as e:
     import sys
     print(f'{sys.path=}')
@@ -23,16 +20,12 @@ except Exception as e:
 
 # sqlite
 from db import sqlite as db
-# from schemas.post import Post, Posts
 from helpers.posts import default_posts
 from helpers.users import default_users
 
 # sqlalchemy
 from orm.sqlite import (
     engine, 
-    SessionLocal, 
-    Base, 
-    get_db, 
     reset_db
 )
 
@@ -43,13 +36,11 @@ from .routers.users import router as users_router
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-SQLALCHEMY = True
-
 app = FastAPI()
 app.include_router(posts_router)
 app.include_router(users_router)
 
-
+SQLALCHEMY = True
 if SQLALCHEMY:
     models.Base.metadata.create_all(bind=engine)
 
@@ -57,16 +48,8 @@ if SQLALCHEMY:
                 models,
                 default_posts,
                 default_users,
-                #  True
+                # drop_tables=True
              )
-    
-    # @app .get('/sqlalchemy')
-    # def test_sql_alchemy(db: Session = Depends(get_db)) -> dict[str, str|schemas.Posts]:
-    #     query = db.query(models.Post)
-    #     print(query)
-    #     posts = query.all()
-    #     return {'query': str(query), 'data': posts}
-    
 else:
     conn = db.setup_db('social.db', 'posts')
     db.create_db_posts(conn, default_posts)

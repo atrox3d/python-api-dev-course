@@ -1,8 +1,7 @@
 from typing_extensions import deprecated
 from fastapi import (
-    FastAPI, HTTPException, Response, status, Depends, APIRouter
+    HTTPException, status, Depends, APIRouter
 )
-from random import randrange
 import logging
 from sqlalchemy.orm import Session
 
@@ -10,13 +9,17 @@ import app.utils as utils
 # sqlite
 from db import sqlite as db
 # from schemas.post import Post, Posts
-import app.schemas as schemas
-from helpers.posts import default_posts
-from helpers.users import default_users
+import schemas
+# from helpers.posts import default_posts
+# from helpers.users import default_users
 
 # sqlalchemy
 from orm.sqlite import (
-    engine, SessionLocal, Base, get_db, reset_db
+    engine, 
+    SessionLocal, 
+    Base, 
+    get_db, 
+    reset_db
 )
 from orm import models
 
@@ -24,13 +27,13 @@ router = APIRouter()
 
 @router.post('/users', 
           status_code=status.HTTP_201_CREATED,
-          response_model=schemas.UserOut
+          response_model=schemas.user.UserOut
 )
 def create_user(
-                    user: schemas.UserCreate, 
+                    user: schemas.user.UserCreate, 
                     db: Session = Depends(get_db)
 # ):
-) -> schemas.UserOut:
+) -> schemas.user.UserOut:
     user.password = utils.hash(user.password)
 
     new_user = models.User(
@@ -44,7 +47,7 @@ def create_user(
 
 @router.get(
             '/users/{id}',
-            response_model=schemas.UserOut
+            response_model=schemas.user.UserOut
 )
 def get_user(
                 id: int,

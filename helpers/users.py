@@ -1,5 +1,5 @@
 from datetime import datetime as dt
-from app.schemas import UserCreate, Users
+from schemas.user import UserCreate, Users
 
 
 default_users: Users = [
