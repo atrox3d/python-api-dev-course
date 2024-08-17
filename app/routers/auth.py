@@ -5,6 +5,7 @@ from db.orm.sqlite import get_db
 import schemas.user
 import db.orm.models as models
 import app.utils
+import app.oauth2
 
 router = APIRouter(tags=['Authentication'])
 
@@ -21,7 +22,13 @@ def login(credentials:schemas.user.UserLogin, db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             details='invalid credentials')
     
-    return {'token': 'example token'}
+    token = app.oauth2.create_access_token(
+        {
+            'user_id': user.id
+        }
+    )
+    return {'token': token, 'token_type': 'bearer'}
+
 
 
 
