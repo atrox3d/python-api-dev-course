@@ -20,8 +20,8 @@ except Exception as e:
 
 # sqlite
 from db.sqlite import sqlite as db
-from helpers.posts import default_posts
-from helpers.users import default_users
+from schemas.helpers.posts import default_posts
+from schemas.helpers.users import default_users
 
 # sqlalchemy
 from db.orm.sqlite import (

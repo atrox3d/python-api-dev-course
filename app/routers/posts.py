@@ -10,8 +10,8 @@ from sqlalchemy.orm import Session
 from db.sqlite import sqlite as db
 # from schemas.post import Post, Posts
 import schemas
-from helpers.posts import default_posts
-from helpers.users import default_users
+from schemas.helpers.posts import default_posts
+from schemas.helpers.users import default_users
 
 # sqlalchemy
 from db.orm.sqlite import (
