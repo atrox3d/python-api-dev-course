@@ -3,12 +3,16 @@ import logging
 
 # sqlite
 from db.sqlite import sqlite as db
-from schemas.helpers.posts import default_posts
-from schemas.helpers.users import default_users
+# from schemas.helpers.posts import default_posts
+# from schemas.helpers.users import default_users
+import schemas
 
 # sqlalchemy
 from db.orm.sqlite import engine, reset_db
 from db.orm import models
+import schemas.helpers
+import schemas.helpers.posts
+import schemas.helpers.users
 from .routers.posts import router as posts_router
 from .routers.users import router as users_router
 
@@ -25,8 +29,8 @@ if SQLALCHEMY:
 
     reset_db(
                 models,
-                default_posts,
-                default_users,
+                schemas.helpers.posts.default_posts,
+                schemas.helpers.users.default_users,
                 # drop_tables=True
              )
 else:

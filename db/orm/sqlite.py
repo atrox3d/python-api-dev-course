@@ -6,6 +6,8 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 import schemas
+import schemas.post
+import schemas.user
 
 SQLALCHEMY_DATABASE_URL = "sqlite:///social.db"
 # SQLALCHEMY_DATABASE_URL = "postgresql://user:password@postgresserver/db"
