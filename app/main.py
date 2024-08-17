@@ -1,20 +1,39 @@
-from typing_extensions import deprecated
-from fastapi import FastAPI, HTTPException, Response, status, Depends
-from random import randrange
+from fastapi import (
+    FastAPI, 
+    # HTTPException, 
+    # Response, 
+    # status, 
+    Depends
+)
+# from random import randrange
 import logging
 from sqlalchemy.orm import Session
 
-import utils
+
+# import schemas
+try:
+    from . import schemas
+except Exception as e:
+    import sys
+    print(f'{sys.path=}')
+    print(f'{sys.argv=}')
+    print(f'{__name__=}')
+    print(e)
+    exit()
+
 # sqlite
 from db import sqlite as db
 # from schemas.post import Post, Posts
-import schemas
 from helpers.posts import default_posts
 from helpers.users import default_users
 
 # sqlalchemy
 from orm.sqlite import (
-    engine, SessionLocal, Base, get_db, reset_db
+    engine, 
+    SessionLocal, 
+    Base, 
+    get_db, 
+    reset_db
 )
 
 from orm import models
@@ -41,12 +60,12 @@ if SQLALCHEMY:
                 #  True
              )
     
-    @app .get('/sqlalchemy')
-    def test_sql_alchemy(db: Session = Depends(get_db)) -> dict[str, str|schemas.Posts]:
-        query = db.query(models.Post)
-        print(query)
-        posts = query.all()
-        return {'query': str(query), 'data': posts}
+    # @app .get('/sqlalchemy')
+    # def test_sql_alchemy(db: Session = Depends(get_db)) -> dict[str, str|schemas.Posts]:
+    #     query = db.query(models.Post)
+    #     print(query)
+    #     posts = query.all()
+    #     return {'query': str(query), 'data': posts}
     
 else:
     conn = db.setup_db('social.db', 'posts')

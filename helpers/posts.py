@@ -1,5 +1,5 @@
 from datetime import datetime as dt
-from schemas import PostBase, Posts
+from app.schemas import PostBase, Posts
 
 
 default_posts: Posts = [
