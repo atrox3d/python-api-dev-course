@@ -32,6 +32,7 @@ def create_access_token(data:dict):
     print(f'TOKEN| {SECRET_KEY = }')
     print(f'TOKEN| {ALGORITHM  = }')
     print(f'TOKEN| {now        = }')
+    print(f'TOKEN| {delta      = }')
     print(f'TOKEN| {expire     = }')
     print(f'TOKEN| {to_encode  = }')
     print(f'TOKEN| {token      = }')
