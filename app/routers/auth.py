@@ -13,26 +13,41 @@ router = APIRouter(tags=['Authentication'])
 
 @router.post('/login')
 def login(
-            # credentials:schemas.user.UserLogin, 
-            credentials:OAuth2PasswordRequestForm = Depends(), 
+            # not using pydantic: # credentials:schemas.user.UserLogin, 
+            # using form data
+            credentials:OAuth2PasswordRequestForm = 
+                    Depends(),      # get username+password from form data
+                                    # instead of JSON
             db: Session = Depends(get_db)
 ):
+    print(f'LOGIN| credentials = {credentials.__dict__}')
+
+    # find user inside db using name|email|...
     user: models.User = db.query(models.User).filter(
-        models.User.email==credentials.username).first()
+                models.User.email==credentials.username
+        ).first()
+    print(f'LOGIN| user = { {c.name:getattr(user, c.name) for c in user.__table__.columns}} ')
     
+    # check if user found in db
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail='invalid credentials')
     
+    # check that hashed passwords match
     if not app.utils.verify(credentials.password, user.password):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             details='invalid credentials')
     
+    # create encoded token containing 
+    #   - user_id: user_id
+    #   - exp    : token expiration time
     token = app.oauth2.create_access_token(
         {
-            'user_id': user.id
+            'user_id': user.id,
+            # add fields as necessary
         }
     )
+    # return JSON with encoded token
     return {'token': token, 'token_type': 'bearer'}
 
 

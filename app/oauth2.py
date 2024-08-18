@@ -39,3 +39,5 @@ def create_access_token(data:dict):
 
     return token
 
+def verify_token(token:str):
+    pass
