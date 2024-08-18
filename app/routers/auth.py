@@ -21,14 +21,19 @@ def login(
             db: Session = Depends(get_db)
 ):
     print(f'LOGIN| credentials = {credentials.__dict__}')
+    print(f'LOGIN| {credentials.username = }')
+    print(f'LOGIN| {credentials.password = }')
 
     # find user inside db using name|email|...
     user: models.User = db.query(models.User).filter(
                 models.User.email==credentials.username
         ).first()
-    print(f'LOGIN| user = { {c.name:getattr(user, c.name) for c in user.__table__.columns}} ')
-    
+    # print(f'LOGIN| user = { {c.name:getattr(user, c.name) for c in user.__table__.columns}} ')
     # check if user found in db
+    print(f'LOGIN| {user.id         = }')
+    print(f'LOGIN| {user.email      = }')
+    print(f'LOGIN| {user.password   = }')
+    print(f'LOGIN| {user.created_at = }')
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail='invalid credentials')
