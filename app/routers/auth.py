@@ -35,17 +35,18 @@ def login(
     print(f'LOGIN| {user.password   = }')
     print(f'LOGIN| {user.created_at = }')
     if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail='invalid credentials')
     
     # check that hashed passwords match
     if not app.utils.verify(credentials.password, user.password):
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             details='invalid credentials')
     
     # create encoded token containing 
     #   - user_id: user_id
     #   - exp    : token expiration time
+    #   - header ?????
     token = app.oauth2.create_access_token(
         {
             'user_id': user.id,

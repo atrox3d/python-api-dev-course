@@ -1,8 +1,10 @@
 from jose import JWTError, jwt
 from datetime import datetime, timedelta, UTC
+from fastapi import Depends, status, HTTPException
+from fastapi.security import OAuth2PasswordBearer
+
 
 import schemas
-import schemas.user
 
 # SECRET_KEY
 # alghorytm
@@ -16,20 +18,26 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 def create_access_token(data:dict):
-    # work on data shallow copy
-    to_encode = data.copy()
-    # get current time
-    now = datetime.now(
-        # UTC\
+    # https://youtu.be/0sOvCWFmrtA?si=yye34QX-bvHtUTL0&t=23570
+
+    to_encode = data.copy()         # work on data shallow copy
+    now = datetime.now(             # get current time
+        # UTC                       # use UTC to get UTC time
     )
-    # time difference
-    delta = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    # expire time
-    expire = now + delta
-    # add expire time to data
-    to_encode['exp'] = expire
-    # encode everything
-    token = jwt.encode(to_encode, SECRET_KEY, ALGORITHM)
+    
+    delta = timedelta(              # time difference
+        minutes=ACCESS_TOKEN_EXPIRE_MINUTES
+    )
+    
+    expire = now + delta            # expire time
+    
+    to_encode['exp'] = expire       # add expire time to data
+    
+    token = jwt.encode(             # encode everything into token
+                    to_encode,      # data payload + exp (+header????)
+                    SECRET_KEY,
+                    ALGORITHM
+    )
 
     print(f'TOKEN|CREATE| {ACCESS_TOKEN_EXPIRE_MINUTES = }')
     print(f'TOKEN|CREATE| {SECRET_KEY = }')
@@ -47,21 +55,39 @@ def verify_access_token(token:str, credentials_exception:Exception):
     print(f'TOKEN|VERIFY| {token    = }')
     
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM)
+        payload = jwt.decode(                  # decode token, get only payload
+                        token, 
+                        SECRET_KEY, 
+                        algorithms=[ALGORITHM]
+        )
         print(f'TOKEN|VERIFY| {payload  = }')
         id = payload.get('user_id')
         print(f'TOKEN|VERIFY| {id       = }')
-
         if id is None:
             raise credentials_exception
         
         token_data = schemas.user.TokenData(id=id)
         print(f'TOKEN|VERIFY| {token_data  = }')
-        
+
         return token_data
 
     except JWTError as jwte:
         print(f'TOKEN|VERIFY| {jwte       = }')
         raise credentials_exception
-    
-    
+
+# create callable dependency to get token from 
+# header "WWW-Authenticate": "Bearer"
+oauth2_scheme = OAuth2PasswordBearer(
+                        tokenUrl='login'
+)
+
+def get_current_user(
+        token:str = Depends(oauth2_scheme)  # inject token
+):
+    unhautorized = HTTPException(
+                        status_code=status.HTTP_401_UNAUTHORIZED,
+                        detail='invalid credentials',
+                        headers={"WWW-Authenticate": "Bearer"},
+    )
+    # https://youtu.be/0sOvCWFmrtA?si=Dh1sIirAYVL4Si4h&t=26702
+    return verify_access_token(token, unhautorized)
