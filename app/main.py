@@ -1,3 +1,4 @@
+from operator import ge
 from fastapi import FastAPI
 import logging
 
@@ -8,7 +9,7 @@ from db.sqlite import sqlite as db
 import schemas
 
 # sqlalchemy
-from db.orm.sqlite import engine, reset_db
+from db.orm.sqlite import engine, reset_db, get_db
 from db.orm import models
 # import schemas.helpers
 import schemas.helpers.posts
@@ -38,6 +39,17 @@ if SQLALCHEMY:
                 create_users=schemas.helpers.users.default_users,
                 drop_tables=True
             )
+
+    # test PRAGMA foreign_keys, on delete cascade
+    # _db = next(get_db())
+    
+    # for row in _db.query(models.Post).all():
+    #     print(row)
+    # _db.query(models.User).delete()
+    # _db.commit()
+    # for row in _db.query(models.Post).all():
+    #     print(row)
+
 else:
     conn = db.setup_db('social.db', 'posts')
     db.create_db_posts(conn, schemas.helpers.posts.default_posts)

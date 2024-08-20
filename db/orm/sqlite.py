@@ -55,10 +55,11 @@ def reset_db(
         print('MAIN| dropping table posts')
         models.User.__table__.drop(engine)
         models.Post.__table__.drop(engine)
+
         print('MAIN| dropping table users')
         models.User.__table__.create(engine)
         models.Post.__table__.create(engine)
-        _db.commit()
+    _db.commit()
 
     print('MAIN| deleting all users')
     _db.query(models.User).delete()
@@ -68,7 +69,7 @@ def reset_db(
             user.password = app.utils.hash(user.password)
             new_user = models.User(**user.model_dump())
             _db.add(new_user)
-            _db.commit()
+    _db.commit()
 
 
     print('MAIN| deleting all posts')
