@@ -10,6 +10,8 @@ import schemas
 from db.orm.sqlite import get_db
 from db.orm import models
 
+from app import oauth2
+
 router = APIRouter(prefix='/posts', tags=['Posts'])
 
 @router.get(
@@ -28,10 +30,12 @@ def get_posts(
 )
 def create_post(
                     post: schemas.post.PostCreate, 
-                    db: Session = Depends(get_db)
+                    db: Session = Depends(get_db),
+                    user_id: int = Depends(oauth2.get_current_user)
 ):
 # ) -> schemas.post.Post:
     # db.create_db_post(conn, post)
+    print(f'CREATE_POST| {user_id = }')
     new_post = models.Post(
         **post.model_dump()
     )

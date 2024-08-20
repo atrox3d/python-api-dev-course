@@ -55,6 +55,7 @@ def verify_access_token(token:str, credentials_exception:Exception):
     print(f'TOKEN|VERIFY| {token    = }')
     
     try:
+        print(f'TOKEN|VERIFY| decode token')
         payload = jwt.decode(                  # decode token, get only payload
                         token, 
                         SECRET_KEY, 
@@ -84,10 +85,18 @@ oauth2_scheme = OAuth2PasswordBearer(
 def get_current_user(
         token:str = Depends(oauth2_scheme)  # inject token
 ):
+    print(f'GET_CURRENT_USER| {oauth2_scheme.__dict__ = }')
+    # print(f'GET_CURRENT_USER| {oauth2_scheme() = }')
+    print(f'GET_CURRENT_USER| create exception')
     unhautorized = HTTPException(
                         status_code=status.HTTP_401_UNAUTHORIZED,
-                        detail='invalid credentials',
+                        detail='unhautorized: invalid credentials',
                         headers={"WWW-Authenticate": "Bearer"},
     )
     # https://youtu.be/0sOvCWFmrtA?si=Dh1sIirAYVL4Si4h&t=26702
-    return verify_access_token(token, unhautorized)
+    print(f'GET_CURRENT_USER| call verify_access_token')
+    token = verify_access_token(token, unhautorized)
+    print(f'GET_CURRENT_USER| {token = }')
+    print(f'GET_CURRENT_USER| {token == 1 = }')
+    # get user from db
+    return token
