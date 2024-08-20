@@ -35,8 +35,9 @@ if SQLALCHEMY:
                 models,
                 schemas.helpers.posts.default_posts,
                 schemas.helpers.users.default_users,
-                # drop_tables=True
-             )
+                create_rows=False,
+                drop_tables=True
+            )
 else:
     conn = db.setup_db('social.db', 'posts')
     db.create_db_posts(conn, schemas.helpers.posts.default_posts)
