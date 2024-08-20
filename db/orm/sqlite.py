@@ -30,9 +30,8 @@ def get_db():
 
 def reset_db(
                 models:ModuleType, 
-                default_posts:schemas.post.Posts,
-                default_users:schemas.user.Users,
-                create_rows:bool,
+                create_posts:schemas.post.Posts=None,
+                create_users:schemas.user.Users=None,
                 drop_tables:bool=False
 ):
     _db = SessionLocal()
@@ -48,8 +47,8 @@ def reset_db(
 
     print('MAIN| deleting all posts')
     _db.query(models.Post).delete()
-    if create_rows:
-        for post in default_posts:
+    if create_posts:
+        for post in create_posts:
             print(f'MAIN| adding {post}')
             new_post = models.Post(**post.model_dump())
             _db.add(new_post)
@@ -57,8 +56,8 @@ def reset_db(
 
     print('MAIN| deleting all users')
     _db.query(models.User).delete()
-    if create_rows:
-        for user in default_users:
+    if create_users:
+        for user in create_users:
             print(f'MAIN| adding {user}')
             user.password = app.utils.hash(user.password)
             new_user = models.User(**user.model_dump())

@@ -84,26 +84,26 @@ def create_db_posts(conn:Connection, posts:post.PostCreate):
         create_db_post(conn, post)
 
 @logged
-def get_db_posts(conn:Connection) -> post.PostBase:
+def get_db_posts(conn:Connection) -> post.PostDefault:
     conn.row_factory = dict_factory
     rows = execute_sql(conn, '''
         SELECT * FROM posts
     ''')
-    posts = [post.PostBase(**row) for row in rows]
-    return post.PostBase(posts=posts)
+    posts = [post.PostDefault(**row) for row in rows]
+    return post.PostDefault(posts=posts)
 
 @logged
-def find_db_post(conn:Connection, id:int) -> post.PostBase | None:
+def find_db_post(conn:Connection, id:int) -> post.PostDefault | None:
     conn.row_factory = dict_factory
     rows = execute_sql(conn, '''
         SELECT * FROM posts
         WHERE id = :id
     ''', id=id)
     if rows:
-        return post.PostBase(**rows[0])
+        return post.PostDefault(**rows[0])
 
 @logged
-def delete_db_post(conn:Connection, id:int) -> post.PostBase | None:
+def delete_db_post(conn:Connection, id:int) -> post.PostDefault | None:
     conn.row_factory = dict_factory
     rows = execute_sql(conn, '''
         DELETE FROM posts
@@ -111,7 +111,7 @@ def delete_db_post(conn:Connection, id:int) -> post.PostBase | None:
     ''', id=id)
 
 @logged
-def update_db_post(conn:Connection, id:int, update:post.PostCreate) -> post.PostBase | None:
+def update_db_post(conn:Connection, id:int, update:post.PostCreate) -> post.PostDefault | None:
     conn.row_factory = dict_factory
     rows = execute_sql(conn, '''
         UPDATE posts

@@ -1,11 +1,11 @@
 from datetime import datetime as dt
-from schemas.post import PostBase, Posts
+from schemas.post import PostDefault, Post, Posts
 
 
 default_posts: Posts = [
-    PostBase(title='default post 1', content='default content 1',
-             user_id=1),
-    PostBase(title='default post 2', content='default content 2',
-             user_id=1)
+    PostDefault(title='default post 1', content='default content 1',
+             owner_id=1),
+    PostDefault(title='default post 2', content='default content 2',
+             owner_id=1)
 ]
 

@@ -33,9 +33,9 @@ if SQLALCHEMY:
 
     reset_db(
                 models,
-                schemas.helpers.posts.default_posts,
-                schemas.helpers.users.default_users,
-                create_rows=False,
+                create_posts=schemas.helpers.posts.default_posts,
+                # create_posts=None,
+                create_users=schemas.helpers.users.default_users,
                 drop_tables=True
             )
 else:

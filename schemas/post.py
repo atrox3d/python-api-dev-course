@@ -6,8 +6,6 @@ class PostBase(BaseModel):
     content: str
     published: bool = True
 
-    user_id: int
-
     # rating: Optional[int] = None
     # created_at: str = Field(default_factory=lambda:dt.today().strftime('%Y-%m-%d %H:%M:%S'))
     # created_at: dt = Field(default_factory=lambda:dt.today())
@@ -15,6 +13,9 @@ class PostBase(BaseModel):
     # id: int = None
 
 class PostCreate(PostBase): pass
+
+class PostDefault(PostBase):
+    owner_id:int
 
 class Post(PostBase):
     id: int
