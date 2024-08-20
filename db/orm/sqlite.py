@@ -10,6 +10,21 @@ import schemas.user
 
 import app.utils
 
+##################################################################
+# ENFORCE SQLITE FOREIGN KEY
+# https://stackoverflow.com/a/77708922
+##################################################################
+from sqlalchemy.engine import Engine
+from sqlalchemy import event
+
+@event.listens_for(Engine, "connect")
+def set_sqlite_pragma(dbapi_connection, connection_record):
+    cursor = dbapi_connection.cursor()
+    cursor.execute("PRAGMA foreign_keys=ON")
+    cursor.close()
+############################ß######################################
+
+
 SQLALCHEMY_DATABASE_URL = "sqlite:///social.db"
 # SQLALCHEMY_DATABASE_URL = "postgresql://user:password@postgresserver/db"
 
@@ -45,15 +60,6 @@ def reset_db(
         models.Post.__table__.create(engine)
         _db.commit()
 
-    print('MAIN| deleting all posts')
-    _db.query(models.Post).delete()
-    if create_posts:
-        for post in create_posts:
-            print(f'MAIN| adding {post}')
-            new_post = models.Post(**post.model_dump())
-            _db.add(new_post)
-            _db.commit()
-
     print('MAIN| deleting all users')
     _db.query(models.User).delete()
     if create_users:
@@ -62,6 +68,16 @@ def reset_db(
             user.password = app.utils.hash(user.password)
             new_user = models.User(**user.model_dump())
             _db.add(new_user)
+            _db.commit()
+
+
+    print('MAIN| deleting all posts')
+    _db.query(models.Post).delete()
+    if create_posts:
+        for post in create_posts:
+            print(f'MAIN| adding {post}')
+            new_post = models.Post(**post.model_dump())
+            _db.add(new_post)
             _db.commit()
 
     _db.close()
