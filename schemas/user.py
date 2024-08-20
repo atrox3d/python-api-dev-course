@@ -10,6 +10,9 @@ class UserOut(BaseModel):
     email: EmailStr
     created_at: dt
 
+class UserDb(UserOut):
+    password: str
+
 Users = list[UserCreate]
 
 class UserLogin(BaseModel):

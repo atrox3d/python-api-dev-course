@@ -31,11 +31,12 @@ def get_posts(
 def create_post(
                     post: schemas.post.PostCreate, 
                     db: Session = Depends(get_db),
-                    user_id: int = Depends(oauth2.get_current_user)
+                    current_user: models.User = Depends(oauth2.get_current_user)
 ):
 # ) -> schemas.post.Post:
     # db.create_db_post(conn, post)
-    print(f'CREATE_POST| {user_id = }')
+    print(f'CREATE_POST| {current_user = }')
+    print(f'CREATE_POST| { {c.name: getattr(current_user, c.name) for c in current_user.__table__.columns} }')
     new_post = models.Post(
         **post.model_dump()
     )

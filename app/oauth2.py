@@ -1,10 +1,14 @@
 from jose import JWTError, jwt
 from datetime import datetime, timedelta, UTC
-from fastapi import Depends, status, HTTPException
+from fastapi import Depends, Request, status, HTTPException
 from fastapi.security import OAuth2PasswordBearer
+from sqlalchemy.orm import Session
 
 
+from db.orm import models
+from db.orm.sqlite import get_db
 import schemas
+import schemas.user
 
 # SECRET_KEY
 # alghorytm
@@ -83,7 +87,9 @@ oauth2_scheme = OAuth2PasswordBearer(
 )
 
 def get_current_user(
-        token:str = Depends(oauth2_scheme)  # inject token
+        token:str = Depends(oauth2_scheme),  # inject token,
+        db: Session = Depends(get_db)
+        # request: Request = Depends()
 ):
     print(f'GET_CURRENT_USER| {oauth2_scheme.__dict__ = }')
     # print(f'GET_CURRENT_USER| {oauth2_scheme() = }')
@@ -99,4 +105,11 @@ def get_current_user(
     print(f'GET_CURRENT_USER| {token = }')
     print(f'GET_CURRENT_USER| {token == 1 = }')
     # get user from db
-    return token
+    user: models.User = db.query(models.User)\
+                        .filter(models.User.id == token.id)\
+                        .first()
+
+    print(f'GET_CURRENT_USER| { {c.name: getattr(user, c.name) for c in user.__table__.columns} }')
+    # print(f'GET_CURRENT_USER| {schemas.user.UserDb.model_validate(user)}')
+
+    return user
