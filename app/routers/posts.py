@@ -19,10 +19,19 @@ router = APIRouter(prefix='/posts', tags=['Posts'])
          response_model=schemas.post.Posts
 )
 def get_posts(
-                db: Session = Depends(get_db)
+                db: Session = Depends(get_db),
+                current_user: models.User = Depends(oauth2.get_current_user),
+                # query params:
+                limit:int=10,
 ) -> schemas.post.Posts:
     # return db.get_db_posts(conn)
-    return db.query(models.Post).all()
+    print(f'GET_POSTS| {limit=}')
+    
+    limited = db.query(models.Post).limit(limit)
+    print(f'{limited=}')
+    all = limited.all()
+    print(f'{all=}')
+    return all
 
 @router.get(
         '/owned',
