@@ -58,6 +58,39 @@
 					"response": []
 				},
 				{
+					"name": "get_owned_posts",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://127.0.0.1:8000/posts/owned",
+							"protocol": "http",
+							"host": [
+								"127",
+								"0",
+								"0",
+								"1"
+							],
+							"port": "8000",
+							"path": [
+								"posts",
+								"owned"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "create_post",
 					"request": {
 						"auth": {
@@ -156,6 +189,16 @@
 				{
 					"name": "update_post",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "PUT",
 						"header": [],
 						"body": {
@@ -188,10 +231,29 @@
 				{
 					"name": "delete_post",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT_TOKEN}}}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "DELETE",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "text"
+								}
+							}
+						},
 						"url": {
-							"raw": "http://127.0.0.1:8000/posts/2",
+							"raw": "http://127.0.0.1:8000/posts/3",
 							"protocol": "http",
 							"host": [
 								"127",
@@ -202,7 +264,7 @@
 							"port": "8000",
 							"path": [
 								"posts",
-								"2"
+								"3"
 							]
 						}
 					},
