@@ -31,17 +31,19 @@ def get_posts(
     print(f'GET_POSTS| {skip=}')
     print(f'GET_POSTS| {search=!r}')
     
-    filtered = db.query(models.Post).filter(models.Post.title.contains(search))
-
-    limited = filtered.limit(limit)
-    # print(f'GET_POSTS| {limited=}')
-
-    skipped = limited.offset(skip)
-    # print(f'GET_POSTS| {skipped=}')
-    
-    all = skipped.all()
-    # print(f'GET_POSTS| {all=}')
-    return all
+    # select * from posts 
+    # inner join users 
+    # on posts.owner_id = users.id
+    # where posts.title like '%SEARCH%'
+    # limit LIMIT
+    # offset SKIP
+    return (
+            db.query(models.Post)
+            .filter(models.Post.title.contains(search))
+            .limit(limit)
+            .offset(skip)
+            .all()
+    )
 
 @router.get(
         '/owned',
