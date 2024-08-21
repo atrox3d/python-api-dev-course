@@ -24,17 +24,23 @@ def get_posts(
                 # query params:
                 limit:int=10,
                 skip:int=0,
+                search:str=''
 ) -> schemas.post.Posts:
     # return db.get_db_posts(conn)
     print(f'GET_POSTS| {limit=}')
     print(f'GET_POSTS| {skip=}')
+    print(f'GET_POSTS| {search=!r}')
     
-    limited = db.query(models.Post).limit(limit)
-    print(f'GET_POSTS| {limited=}')
+    filtered = db.query(models.Post).filter(models.Post.title.contains(search))
+
+    limited = filtered.limit(limit)
+    # print(f'GET_POSTS| {limited=}')
+
     skipped = limited.offset(skip)
-    print(f'GET_POSTS| {skipped=}')
+    # print(f'GET_POSTS| {skipped=}')
+    
     all = skipped.all()
-    print(f'GET_POSTS| {all=}')
+    # print(f'GET_POSTS| {all=}')
     return all
 
 @router.get(
