@@ -20,6 +20,7 @@ class PostDefault(PostBase):
 class Post(PostBase):
     id: int
     created_at: dt
+    owner_id:int
 
     # class Config:
         # orm_mode = True
