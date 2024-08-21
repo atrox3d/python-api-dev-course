@@ -93,23 +93,27 @@ def delete_post(
 def update_post(
                     id:int, 
                     update:schemas.post.PostCreate, 
-                    db: Session = Depends(get_db)
+                    db: Session = Depends(get_db),
+                    current_user: models.User = Depends(oauth2.get_current_user)
 ) -> schemas.post.PostBase:
     # post = db.find_db_post(conn, id)
     query = db.query(models.Post).filter(models.Post.id == id)
     post = query.first()
     if post:
-        post.title = update.title
-        post.content = update.content
-        # db.update_db_post(conn, id, post.model_dump())
-        print(update.model_dump())
-        query.update(
-                update.model_dump()
-                # {'title': 'updated', 'content': 'updated'}
-            )
-        db.commit()
-        db.refresh(post)
-        return post
+        if post.owner_id == current_user.id:
+            post.title = update.title
+            post.content = update.content
+            # db.update_db_post(conn, id, post.model_dump())
+            print(update.model_dump())
+            query.update(
+                    update.model_dump()
+                    # {'title': 'updated', 'content': 'updated'}
+                )
+            db.commit()
+            db.refresh(post)
+            return post
+        else:
+            raise HTTPException(status.HTTP_403_FORBIDDEN, f'not authorized to update')
     else:
         raise HTTPException(status.HTTP_404_NOT_FOUND, f'id {id} not found')
 
