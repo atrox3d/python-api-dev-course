@@ -4,7 +4,7 @@ import logging
 
 # sqlite
 from db.sqlite import sqlite as db
-import schemas
+import schemas.post
 
 # sqlalchemy
 from db.orm.sqlite import get_db
@@ -38,7 +38,8 @@ def create_post(
     print(f'CREATE_POST| {current_user = }')
     print(f'CREATE_POST| { {c.name: getattr(current_user, c.name) for c in current_user.__table__.columns} }')
     new_post = models.Post(
-        **post.model_dump()
+        **post.model_dump(),
+        owner_id=current_user.id
     )
     db.add(new_post)
     db.commit()
