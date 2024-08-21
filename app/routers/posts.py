@@ -28,7 +28,7 @@ def get_posts(
         '/owned',
          response_model=schemas.post.Posts,
 )
-def get_posts(
+def get_owned_posts(
                 db: Session = Depends(get_db),
                 current_user: models.User = Depends(oauth2.get_current_user)
 ) -> schemas.post.Posts:
