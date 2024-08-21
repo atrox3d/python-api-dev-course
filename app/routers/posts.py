@@ -69,14 +69,20 @@ def get_post(
 @router.delete('/{id}', status_code=status.HTTP_204_NO_CONTENT)
 def delete_post(
                     id:int, 
-                    db: Session = Depends(get_db)
+                    db: Session = Depends(get_db),
+                    current_user: models.User = Depends(oauth2.get_current_user)
 ):
     # if db.find_db_post(conn, id):
         # db.delete_db_post(conn, id)
     query = db.query(models.Post).filter(models.Post.id == id)
-    if query.first():
-        query.delete()
-        db.commit()
+
+    post: models.Post = query.first()
+    if post:
+        if post.owner_id == current_user.id:
+            query.delete()
+            db.commit()
+        else:
+            raise HTTPException(status.HTTP_403_FORBIDDEN, f'not authorized to delete')
     else:
         raise HTTPException(status.HTTP_404_NOT_FOUND, f'id {id} not found')
 
