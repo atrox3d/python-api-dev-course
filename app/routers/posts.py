@@ -32,8 +32,6 @@ def get_owned_posts(
                 db: Session = Depends(get_db),
                 current_user: models.User = Depends(oauth2.get_current_user)
 ) -> schemas.post.Posts:
-    # return db.get_db_posts(conn)
-    # return db.query(models.Post).all()
     return db.query(models.Post).filter(models.Post.owner_id==current_user.id)
 
 @router.post('/',

@@ -1,6 +1,8 @@
 from pydantic import BaseModel
 from datetime import datetime as dt
 
+from . import user
+
 class PostBase(BaseModel):
     title: str
     content: str
@@ -24,5 +26,6 @@ class Post(PostBase):
 
     # class Config:
         # orm_mode = True
+    owner: user.UserOut
 
 Posts = list[Post]

@@ -1,9 +1,12 @@
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
+import sqlalchemy
 from sqlalchemy.sql.sqltypes import TIMESTAMP
 # from sqlalchemy.sql.expression import text
 from sqlalchemy.sql import func
 import sqlalchemy as sa
 from .sqlite import Base
+from sqlalchemy.orm import relationship
+
 
 class Post(Base):
     __tablename__ = 'posts'
@@ -20,6 +23,8 @@ class Post(Base):
                         server_default=func.now())  # server side timestamp
     owner_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'),
                       nullable=False)
+    
+    owner = relationship('User')
 
 class User(Base):
     __tablename__ = 'users'
