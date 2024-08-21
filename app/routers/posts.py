@@ -24,6 +24,18 @@ def get_posts(
     # return db.get_db_posts(conn)
     return db.query(models.Post).all()
 
+@router.get(
+        '/owned',
+         response_model=schemas.post.Posts,
+)
+def get_posts(
+                db: Session = Depends(get_db),
+                current_user: models.User = Depends(oauth2.get_current_user)
+) -> schemas.post.Posts:
+    # return db.get_db_posts(conn)
+    # return db.query(models.Post).all()
+    return db.query(models.Post).filter(models.Post.owner_id==current_user.id)
+
 @router.post('/',
           status_code=status.HTTP_201_CREATED,
           response_model=schemas.post.Post
