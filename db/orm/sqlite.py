@@ -9,6 +9,7 @@ import schemas.post
 import schemas.user
 
 import app.utils
+from config import sqlite_settings
 
 ##################################################################
 # ENFORCE SQLITE FOREIGN KEY
@@ -22,10 +23,11 @@ def set_sqlite_pragma(dbapi_connection, connection_record):
     cursor = dbapi_connection.cursor()
     cursor.execute("PRAGMA foreign_keys=ON")
     cursor.close()
-############################ß######################################
+##################################################################
 
 
-SQLALCHEMY_DATABASE_URL = "sqlite:///social.db"
+# SQLALCHEMY_DATABASE_URL = "sqlite:///social.db"
+SQLALCHEMY_DATABASE_URL = sqlite_settings.database_url
 # SQLALCHEMY_DATABASE_URL = "postgresql://user:password@postgresserver/db"
 
 engine = create_engine(

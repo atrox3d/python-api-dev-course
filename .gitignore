@@ -3,3 +3,5 @@ venv/
 *.egg-info/
 ?venv/
 social.db
+*.env
+

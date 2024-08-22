@@ -9,6 +9,7 @@ from db.orm import models
 from db.orm.sqlite import get_db
 import schemas
 import schemas.user
+from config import sqlite_settings
 
 # SECRET_KEY
 # alghorytm
@@ -17,9 +18,12 @@ import schemas.user
 # https://github.com/fastapi/fastapi/blob/0.68.0/docs_src/security/tutorial004.py
 # to get a string like this run:
 # openssl rand -hex 32
-SECRET_KEY = 'bdc7593632ada6a134bf519314cdb58e8f10680d21c9944374d87c62fb993914'
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+# SECRET_KEY = 'bdc7593632ada6a134bf519314cdb58e8f10680d21c9944374d87c62fb993914'
+# ALGORITHM = "HS256"
+# ACCESS_TOKEN_EXPIRE_MINUTES = 30
+SECRET_KEY = sqlite_settings.secret_key
+ALGORITHM = sqlite_settings.algorithm
+ACCESS_TOKEN_EXPIRE_MINUTES = sqlite_settings.access_token_expire_minutes
 
 def create_access_token(data:dict):
     # https://youtu.be/0sOvCWFmrtA?si=yye34QX-bvHtUTL0&t=23570
