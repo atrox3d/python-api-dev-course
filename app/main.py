@@ -3,8 +3,7 @@ import logging
 
 import schemas
 
-# sqlalchemy
-from db.orm.sqlite import engine, reset_db, get_db
+from db.orm.sqlite import engine, reset_db
 from db.orm import models
 
 import schemas.helpers.posts
@@ -15,7 +14,6 @@ from .routers import users
 from .routers import auth
 
 
-
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -24,8 +22,9 @@ app.include_router(posts.router)
 app.include_router(users.router)
 app.include_router(auth.router)
 
+# create db if not existing
 models.Base.metadata.create_all(bind=engine)
-
+# reset, populate tables
 reset_db(
             models,
             create_posts=schemas.helpers.posts.default_posts,
@@ -34,6 +33,7 @@ reset_db(
             drop_tables=True
         )
 
+##########################################################
 # test PRAGMA foreign_keys, on delete cascade
 # _db = next(get_db())
 
@@ -43,7 +43,7 @@ reset_db(
 # _db.commit()
 # for row in _db.query(models.Post).all():
 #     print(row)
-
+##########################################################
 
 @app.get("/")
 def root() -> dict[str, str]:
