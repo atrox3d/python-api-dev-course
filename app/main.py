@@ -1,9 +1,9 @@
-from operator import ge
 from fastapi import FastAPI
 import logging
 
 # sqlite
 from db.sqlite import sqlite as db
+
 # from schemas.helpers.posts import default_posts
 # from schemas.helpers.users import default_users
 import schemas
