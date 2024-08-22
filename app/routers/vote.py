@@ -23,6 +23,14 @@ def vote(
             current_user: models.User = Depends(oauth2.get_current_user),
 ):
     
+    if not (db.query(models.Post)
+            .filter(models.Post.id==vote.post_id)
+            .first()):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail='post not found'
+        )
+
     vote_query = (
                 db.query(models.Vote)
                 .filter(
