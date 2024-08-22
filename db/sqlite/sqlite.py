@@ -4,6 +4,8 @@ from sqlite3 import Connection, Cursor
 from datetime import datetime as dt
 import logging
 
+from schemas.post import PostDefault
+
 import schemas.post as post
 
 # from schemas.schemas import Post, Posts
@@ -18,6 +20,11 @@ def logged(fn):
         logger.debug(f'{fn.__name__} | {result=}')
         return result
     return wrap
+
+@logged
+def setupdb(default_posts:list[PostDefault]):
+    conn = setup_db('social.db', 'posts')
+    create_db_posts(conn, default_posts)
 
 @logged
 def dict_factory(connection, row) -> dict:
