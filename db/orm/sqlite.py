@@ -56,33 +56,53 @@ def reset_db(
     _db = SessionLocal()
 
     if drop_tables:
-        print('MAIN| dropping table posts')
+        print('RESET_DB| dropping table votes')
+        models.Vote.__table__.drop(engine)
+
+        print('RESET_DB| dropping table users')
         models.User.__table__.drop(engine)
+
+        print('RESET_DB| dropping table posts')
         models.Post.__table__.drop(engine)
 
-        print('MAIN| dropping table users')
+
+
+        print('RESET_DB| creating table users')
         models.User.__table__.create(engine)
+
+        print('RESET_DB| creating table posts')
         models.Post.__table__.create(engine)
+
+        print('RESET_DB| creating table votes')
+        models.Vote.__table__.create(engine)
     _db.commit()
 
-    print('MAIN| deleting all users')
+    print('RESET_DB| deleting all users')
     _db.query(models.User).delete()
     if create_users:
         for user in create_users:
-            print(f'MAIN| adding {user}')
+            print(f'RESET_DB| adding {user}')
             user.password = app.utils.hash(user.password)
             new_user = models.User(**user.model_dump())
             _db.add(new_user)
     _db.commit()
 
 
-    print('MAIN| deleting all posts')
+    print('RESET_DB| deleting all posts')
     _db.query(models.Post).delete()
     if create_posts:
         for post in create_posts:
-            print(f'MAIN| adding {post}')
+            print(f'RESET_DB| adding {post}')
             new_post = models.Post(**post.model_dump())
             _db.add(new_post)
             _db.commit()
+
+
+    print('RESET_DB| deleting all votes, if any')
+    _db.query(models.Vote).delete()
+    print(f'RESET_DB| adding vote')
+    _db.add(models.Vote(post_id=1, user_id=2))
+    _db.commit()
+
 
     _db.close()
