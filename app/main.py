@@ -12,6 +12,7 @@ import schemas.helpers.users
 from .routers import posts
 from .routers import users
 from .routers import auth
+from .routers import example
 
 
 logging.basicConfig(level=logging.INFO)
@@ -21,6 +22,7 @@ app = FastAPI()
 app.include_router(posts.router)
 app.include_router(users.router)
 app.include_router(auth.router)
+app.include_router(example.router)
 
 # create db if not existing
 models.Base.metadata.create_all(bind=engine)
