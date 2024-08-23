@@ -1,3 +1,4 @@
+import json
 from fastapi import HTTPException, status, Depends, APIRouter
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
@@ -32,3 +33,41 @@ def db(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f'{tablename=} not found'
         )
+
+@router.get('/table/import/{tablename}/from/{filename}')
+def db(
+        tablename:str,
+        filename:str,
+        delete:bool=False,
+        db: Session = Depends(get_db),
+):
+    print(tablename, filename, delete)
+    try:
+        model = get_tables_models(models)[tablename]
+
+        if delete:
+            db.query(model).delete()
+        
+        with open(filename) as fp:
+            data = json.load(fp)
+        for row in data:
+            db.add(model(**row))
+        db.commit()
+    except KeyError:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f'{tablename=} not found'
+        )
+    except FileNotFoundError:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f'{filename=} not found'
+        )
+    except json.decoder.JSONDecodeError as jde:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=repr(jde)
+        )
+
+
+
