@@ -60,71 +60,41 @@ def import_all(
             models,
             tablename,
             filename,
+            json_provider,
             delete_existing=delete_existing
         )
 
-
-
-
-def _reset_db(
-                engine,
-                models:ModuleType,
-                create_posts:schemas.post.Posts=None,
-                create_users:schemas.user.Users=None,
-                drop_tables:bool=False
+def hash_passwords(
+        db:Session,
+        models:ModuleType,
 ):
-    _db = SessionLocal()
-
-    if drop_tables:
-        print('RESET_DB| dropping table votes')
-        models.Vote.__table__.drop(engine)
-
-        print('RESET_DB| dropping table users')
-        models.User.__table__.drop(engine)
-
-        print('RESET_DB| dropping table posts')
-        models.Post.__table__.drop(engine)
+    for row in db.query(models.User).all():
+        hashed_password = app.utils.hash(row.password)
+        # print(row.email, row.password, hashed_password)
+        row.password = hashed_password
+    db.commit()
 
 
+def setup_db(
+        db:Session,
+        models:ModuleType,
+        json_provider:Callable=None,
+        delete_existing:bool=False
 
-        print('RESET_DB| creating table users')
-        models.User.__table__.create(engine)
+):
+    print(f'SETUP_DB| importing tables')
+    import_all(
+                db,
+                models,
+                'users',
+                'posts',
+                delete_existing=True
+            )
+    
+    # print(f'SETUP_DB| hashing passwords')
+    # hash_passwords(
+    #             db,
+    #             models,
+    # )
 
-        print('RESET_DB| creating table posts')
-        models.Post.__table__.create(engine)
-
-        print('RESET_DB| creating table votes')
-        models.Vote.__table__.create(engine)
-    _db.commit()
-
-    print('RESET_DB| deleting all users')
-    _db.query(models.User).delete()
-    if create_users:
-        for user in create_users:
-            print(f'RESET_DB| adding {user}')
-            user.password = app.utils.hash(user.password)
-            new_user = models.User(**user.model_dump())
-            _db.add(new_user)
-    _db.commit()
-
-
-    print('RESET_DB| deleting all posts')
-    _db.query(models.Post).delete()
-    if create_posts:
-        for post in create_posts:
-            print(f'RESET_DB| adding {post}')
-            new_post = models.Post(**post.model_dump())
-            _db.add(new_post)
-            _db.commit()
-
-
-    print('RESET_DB| deleting all votes, if any')
-    _db.query(models.Vote).delete()
-    print(f'RESET_DB| adding vote')
-    _db.add(models.Vote(post_id=1, user_id=2))
-    _db.commit()
-
-
-    _db.close()
-
-
+    print(f'SETUP_DB| done')

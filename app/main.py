@@ -32,22 +32,14 @@ app.include_router(utility.router)
 
 # create db if not existing
 models.Base.metadata.create_all(bind=engine)
-# reset, populate tables
-# reset_db(
-#             engine, 
-#             models,
-#             create_posts=helpers.toremove.default_posts.default_posts,
-#             # create_posts=None,
-#             create_users=helpers.toremove.default_users.default_users,
-#             drop_tables=True
-#         )
-helpers.db.import_all(
-            next(get_db()),
-            models,
-            'users',
-            'posts',
-            delete_existing=True
-        )
+
+if True:
+    helpers.db.setup_db(
+                next(get_db()),
+                models,
+                delete_existing=True
+    )
+
 ##########################################################
 # test PRAGMA foreign_keys, on delete cascade
 # _db = next(get_db())
