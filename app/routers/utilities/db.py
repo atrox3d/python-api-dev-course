@@ -1,5 +1,6 @@
 import json
 from fastapi import HTTPException, status, Depends, APIRouter
+import sqlalchemy
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 
@@ -20,7 +21,7 @@ def db(
         db: Session = Depends(get_db),
 ):
     try:
-        model = helpers.db.get_tables_models(models)[tablename]
+        model = helpers.db.get_tables_models_from_module(models)[tablename]
         rows = db.query(model).all()
         return {tablename: rows}
     except KeyError:
@@ -38,12 +39,19 @@ def db(
 ):
     print(tablename, filename, delete)
     try:
+        if delete:
+            helpers.db.delete_all_records(
+                db, 
+                helpers.db.get_model_from_tablename(
+                    tablename, models
+                )
+            )
         helpers.db.import_table_from_json(
             db,
             models,
             tablename,
             filename,
-            delete_existing=delete
+            # delete_existing=delete
         )
     except KeyError:
         raise HTTPException(
@@ -60,7 +68,11 @@ def db(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=repr(jde)
         )
-
+    except sqlalchemy.exc.IntegrityError as ie:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=repr(ie)
+        )
 
 
 @router.get('/table/import/all')
@@ -69,12 +81,15 @@ def db(
         db: Session = Depends(get_db),
 ):
     try:
+        if delete:
+            helpers.db.delete_all_records(db, models.User)
+            helpers.db.delete_all_records(db, models.Post)
         helpers.db.import_all(
             db,
             models,
             'users',
             'posts',
-            delete_existing=delete
+            # delete_existing=delete
         )
 
     except KeyError as ke:
@@ -92,3 +107,9 @@ def db(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=repr(jde)
         )
+    except sqlalchemy.exc.IntegrityError as ie:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=repr(ie)
+        )
+

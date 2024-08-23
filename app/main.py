@@ -37,7 +37,7 @@ if True:
     helpers.db.setup_db(
                 next(get_db()),
                 models,
-                delete_existing=True
+                # delete_existing=True
     )
 
 ##########################################################
