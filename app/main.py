@@ -7,8 +7,8 @@ import schemas
 from db.orm.sqlite import engine
 from db.orm import models
 
-import helpers.toremove.posts
-import helpers.toremove.users
+import helpers.toremove.default_posts
+import helpers.toremove.default_users
 
 from .routers import posts
 from .routers import users
@@ -35,9 +35,9 @@ models.Base.metadata.create_all(bind=engine)
 reset_db(
             engine, 
             models,
-            create_posts=helpers.toremove.posts.default_posts,
+            create_posts=helpers.toremove.default_posts.default_posts,
             # create_posts=None,
-            create_users=helpers.toremove.users.default_users,
+            create_users=helpers.toremove.default_users.default_users,
             drop_tables=True
         )
 
