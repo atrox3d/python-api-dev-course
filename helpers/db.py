@@ -10,6 +10,7 @@ from db.orm import models
 import schemas.post
 import schemas.user
 import app.utils
+import helpers.default_users
 
 def get_tables_models(module) -> dict:
     return {
@@ -17,6 +18,10 @@ def get_tables_models(module) -> dict:
         [getattr(module, name) for name in dir(module)]
         if getattr(model, '__tablename__', None) is not None
     }
+
+
+def delete_all(db, model):
+        db.query(model).delete()
 
 def import_table_from_json(
         db:Session,
@@ -29,7 +34,7 @@ def import_table_from_json(
     model = get_tables_models(models)[tablename]
 
     if delete_existing:
-        db.query(model).delete()
+        delete_all(model)
 
     if filename is not None:
         with open(filename) as fp:
@@ -82,13 +87,23 @@ def setup_db(
         delete_existing:bool=False
 
 ):
+    delete_all(db, models.Post)
+    delete_all(db, models.User)
+
+    print(f'SETUP_DB| importing defaults')
+    for user in helpers.default_users.default_users:
+        db_user = models.User(**user.model_dump())
+        db_user.password = app.utils.hash(user.password)
+        db.add(db_user)
+    db.commit()
+
     print(f'SETUP_DB| importing tables')
     import_all(
                 db,
                 models,
                 'users',
                 'posts',
-                delete_existing=True
+                delete_existing=False
             )
     
     # print(f'SETUP_DB| hashing passwords')

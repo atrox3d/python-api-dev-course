@@ -9,7 +9,7 @@ from db.orm.sqlite import engine, get_db
 from db.orm import models
 
 import helpers.toremove.default_posts
-import helpers.toremove.default_users
+import helpers.default_users
 
 from .routers import posts
 from .routers import users
