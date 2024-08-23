@@ -6,3 +6,4 @@ social.db
 *.env
 
 *.json
+!fastapi-tutorial.postman_collection.json
