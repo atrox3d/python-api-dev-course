@@ -4,7 +4,7 @@ import logging
 
 from app import oauth2, utils
 # sqlite
-from db.sqlite import sqlite as db
+# from db.sqlite import sqlite as db
 import schemas.vote
 
 # sqlalchemy
