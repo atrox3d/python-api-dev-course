@@ -1,9 +1,10 @@
 from fastapi import FastAPI
 import logging
 
+from helpers.toremove.db import reset_db
 import schemas
 
-from db.orm.sqlite import engine, reset_db
+from db.orm.sqlite import engine
 from db.orm import models
 
 import schemas.helpers.posts
@@ -32,6 +33,7 @@ app.include_router(utility.router)
 models.Base.metadata.create_all(bind=engine)
 # reset, populate tables
 reset_db(
+            engine, 
             models,
             create_posts=schemas.helpers.posts.default_posts,
             # create_posts=None,
