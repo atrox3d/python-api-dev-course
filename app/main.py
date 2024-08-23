@@ -14,6 +14,7 @@ from .routers import users
 from .routers import auth
 from .routers import vote
 from .routers import example
+from .routers import utility
 
 
 logging.basicConfig(level=logging.INFO)
@@ -25,6 +26,7 @@ app.include_router(users.router)
 app.include_router(auth.router)
 app.include_router(vote.router)
 app.include_router(example.router)
+app.include_router(utility.router)
 
 # create db if not existing
 models.Base.metadata.create_all(bind=engine)
