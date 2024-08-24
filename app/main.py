@@ -35,25 +35,63 @@ def setup_db(max_votes:int=10):
 
 @asynccontextmanager
 async def lifespan(app:FastAPI):
+
     from config import LifespanSettings
     settings = LifespanSettings()
     print(f'LIFESPAN| start {settings=}')
 
     if settings.reset_db:
+        print(f'LIFESPAN| reset_db({settings.max_votes=})')
         if settings.max_votes is not None:
             setup_db(settings.max_votes)
         else:
             setup_db()
     else:
-        if settings.import_users:
-            # helpers.db.import_table_from_json()
-            pass
-        
-        if settings.import_posts:
-            pass
+        #
+        # deleting users also deletes posts, cascade
+        #
+        if settings.import_users and settings.json_users:
+            if settings.delete_users:
+                print(f'LIFESPAN| delete users')
+                helpers.db.delete_all_records(
+                    next(get_db()),
+                    models.User
+                )
+            print(f'LIFESPAN| import users')
+            helpers.db.import_table_from_json(
+                next(get_db()),
+                models,
+                'users',
+                settings.json_users
+            )
 
-        if settings.fake_votes:
-            pass
+        if settings.import_posts and settings.json_posts:
+            if settings.delete_posts:
+                print(f'LIFESPAN| delete posts')
+                helpers.db.delete_all_records(
+                    next(get_db()),
+                    models.Post
+                )
+            print(f'LIFESPAN| import posts')
+            helpers.db.import_table_from_json(
+                next(get_db()),
+                models,
+                'posts',
+                settings.json_posts
+            )
+        
+        if settings.fake_votes and settings.max_votes:
+            print(f'LIFESPAN| delete votes')
+            helpers.db.delete_all_records(
+                next(get_db()),
+                models.Vote
+            )
+            print(f'LIFESPAN| create votes')
+            helpers.db.create_votes(
+                next(get_db()),
+                models,
+                settings.max_votes
+            )
     
     yield
     print(f'LIFESPAN| end {settings=}')

@@ -20,6 +20,7 @@ def get_model_from_tablename(tablename:str, module:ModuleType):
 
 def delete_all_records(db, model):
         db.query(model).delete()
+        db.commit()
 
 def load_json_into_table(db:Session, filename:str, model):
     print(f'LOAD_JSON_INTO_TABLE| loading {filename}')
@@ -83,6 +84,7 @@ def create_votes(
         models:ModuleType,
         max_votes:int
 ):
+    print(f'CREATE_VOTES| {max_votes=}')
     total_posts = db.query(models.Post).count()
     print(f'CREATE_VOTES| {total_posts=}')
     
