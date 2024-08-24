@@ -25,9 +25,11 @@ class LifespanSettings(BaseSettings):
     reset_db: bool = False
 
     import_posts: bool = False
+    json_posts: str|None = None
     max_posts: int|None = None
 
     import_users: bool = False
+    json_users: str|None = None
     max_users: int|None = None
 
     fake_votes: bool = False
