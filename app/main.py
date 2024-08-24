@@ -1,3 +1,5 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 import logging
 
@@ -22,7 +24,13 @@ from .routers import utility
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app:FastAPI):
+    print('LIFESPAN| start')
+    yield
+    print('LIFESPAN| end')
+
+app = FastAPI(lifespan=lifespan)
 app.include_router(posts.router)
 app.include_router(users.router)
 app.include_router(auth.router)
