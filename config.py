@@ -23,6 +23,18 @@ sqlite_settings = SqliteSettings()
 # print(sqlite_settings)
 class LifespanSettings(BaseSettings):
     reset_db: bool = False
+
+    import_posts: bool = False
+    max_posts: int|None = None
+
+    import_users: bool = False
+    max_users: int|None = None
+
+    fake_votes: bool = False
+    max_votes: int|None = None
+
+
+
     model_config = SettingsConfigDict(env_file=('.lifespan.env'))
 
 

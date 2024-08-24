@@ -1,17 +1,18 @@
 from contextlib import asynccontextmanager
+from operator import setitem
 
 from fastapi import FastAPI
 import logging
 
 from helpers.toremove.db import reset_db
 import helpers.db
-import schemas
+# import schemas
 
 from db.orm.sqlite import engine, get_db
 from db.orm import models
 
-import helpers.toremove.default_posts
-import helpers.default_users
+# import helpers.toremove.default_posts
+# import helpers.default_users
 
 from .routers import posts
 from .routers import users
@@ -29,6 +30,20 @@ async def lifespan(app:FastAPI):
     from config import LifespanSettings
     settings = LifespanSettings()
     print(f'LIFESPAN| start {settings=}')
+
+    if settings.reset_db:
+        setup_db()
+    else:
+        if settings.import_users:
+            # helpers.db.import_table_from_json()
+            pass
+        
+        if settings.import_posts:
+            pass
+
+        if settings.fake_votes:
+            pass
+    
     yield
     print(f'LIFESPAN| end {settings=}')
 
@@ -43,12 +58,12 @@ app.include_router(utility.router)
 # create db if not existing
 models.Base.metadata.create_all(bind=engine)
 
-if False:
+def setup_db(max_votes:int=10):
     helpers.db.setup_db(
                 next(get_db()),
                 models,
                 # delete_existing=True
-                max_votes=10
+                max_votes=max_votes
     )
 
 ##########################################################
