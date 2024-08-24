@@ -26,9 +26,11 @@ logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app:FastAPI):
-    print('LIFESPAN| start')
+    from config import LifespanSettings
+    settings = LifespanSettings()
+    print(f'LIFESPAN| start {settings=}')
     yield
-    print('LIFESPAN| end')
+    print(f'LIFESPAN| end {settings=}')
 
 app = FastAPI(lifespan=lifespan)
 app.include_router(posts.router)
@@ -41,7 +43,7 @@ app.include_router(utility.router)
 # create db if not existing
 models.Base.metadata.create_all(bind=engine)
 
-if True:
+if False:
     helpers.db.setup_db(
                 next(get_db()),
                 models,

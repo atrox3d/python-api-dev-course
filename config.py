@@ -20,4 +20,9 @@ class SqliteSettings(CommonSettings):
 
 sqlite_settings = SqliteSettings()
 
-print(sqlite_settings)
+# print(sqlite_settings)
+class LifespanSettings(BaseSettings):
+    reset_db: bool = False
+    model_config = SettingsConfigDict(env_file=('.lifespan.env'))
+
+
