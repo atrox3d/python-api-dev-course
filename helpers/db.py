@@ -156,9 +156,7 @@ def import_posts(
         with open(filename) as fp:
             posts = json.load(fp)
     elif posts is None:
-        raise ValueError(
-            'at least one of filename, json_provider must have a value'
-        )
+        raise ValueError('at least one of filename, json_provider must have a value')
 
     # print(f'LOAD_JSON_INTO_TABLE| loading rows into table')
     total_users = db.query(models.User).count()
