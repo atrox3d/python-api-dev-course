@@ -58,11 +58,9 @@ async def lifespan(app:FastAPI):
                     models.User
                 )
             print(f'LIFESPAN| import users')
-            helpers.db.import_table_from_json(
+            helpers.db.import_users(
                 next(get_db()),
-                models,
-                'users',
-                settings.json_users,
+                filename=settings.json_users,
                 max_rows=settings.max_users
             )
 
