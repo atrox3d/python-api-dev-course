@@ -62,7 +62,8 @@ async def lifespan(app:FastAPI):
                 next(get_db()),
                 models,
                 'users',
-                settings.json_users
+                settings.json_users,
+                max_rows=settings.max_users
             )
 
         if settings.import_posts and settings.json_posts:
@@ -77,7 +78,8 @@ async def lifespan(app:FastAPI):
                 next(get_db()),
                 models,
                 'posts',
-                settings.json_posts
+                settings.json_posts,
+                max_rows=settings.max_posts
             )
         
         if settings.fake_votes and settings.max_votes:

@@ -22,14 +22,18 @@ def delete_all_records(db, model):
         db.query(model).delete()
         db.commit()
 
-def load_json_into_table(db:Session, filename:str, model):
+def load_json_into_table(db:Session, filename:str, model, max_rows=None):
     print(f'LOAD_JSON_INTO_TABLE| loading {filename}')
     with open(filename) as fp:
         data = json.load(fp)
 
     print(f'LOAD_JSON_INTO_TABLE| loading rows into table')
+    rows = 0
     for row in data:
         db.add(model(**row))
+        rows += 1
+        if max_rows is not None and max_rows == rows:
+            break
     db.commit()
 
 def import_table_from_json(
@@ -38,13 +42,14 @@ def import_table_from_json(
         tablename:str,
         filename:str=None,
         json_provider:Callable=None,
+        max_rows=None
 ):
     print(f'IMPORT_TABLE_FROM_JSON| getting model')
     model = get_model_from_tablename(tablename, models)
 
     if filename is not None:
         print(f'IMPORT_TABLE_FROM_JSON| loading {filename} into {tablename}')
-        load_json_into_table(db, filename, model)
+        load_json_into_table(db, filename, model, max_rows)
     elif json_provider is not None:
         raise NotImplementedError
     else:
@@ -57,6 +62,7 @@ def import_all(
         models:ModuleType,
         *tablenames:str,
         json_provider:Callable=None,
+        max_rows=None
 ):
     for tablename in tablenames:
         filename = f'{tablename}.json'
@@ -67,6 +73,7 @@ def import_all(
             tablename,
             filename,
             json_provider,
+            max_rows
         )
 
 def hash_passwords(
