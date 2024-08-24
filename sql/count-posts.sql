@@ -1,7 +1,7 @@
 -- SQLite
 
 -- show users and posts ordered by user
-SELECT users.id, users.email, posts.id, posts.title
+SELECT users.id, users.email, posts.id, posts.title, posts.content
 FROM posts
 RIGHT JOIN users
 on users.id = posts.owner_id
