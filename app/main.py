@@ -38,6 +38,7 @@ if True:
                 next(get_db()),
                 models,
                 # delete_existing=True
+                max_votes=10
     )
 
 ##########################################################
