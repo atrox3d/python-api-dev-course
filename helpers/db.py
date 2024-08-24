@@ -5,6 +5,7 @@ import sqlalchemy
 from sqlalchemy.orm import Session
 import random
 
+from db.orm import models
 import app.utils
 import helpers.default_users
 
@@ -141,3 +142,34 @@ def setup_db(
     print(f'SETUP_DB| creating fake votes')
     create_votes(db, models, max_votes)
     print(f'SETUP_DB| done')
+
+def import_posts(
+        db:Session,
+        posts:list=None,
+        filename:str=None,
+        max_rows=None
+):
+    # print(f'IMPORT_TABLE_FROM_JSON| getting model')
+    # model = get_model_from_tablename(tablename, models)
+
+    if filename is not None:
+        with open(filename) as fp:
+            posts = json.load(fp)
+    elif posts is None:
+        raise ValueError(
+            'at least one of filename, json_provider must have a value'
+        )
+
+    # print(f'LOAD_JSON_INTO_TABLE| loading rows into table')
+    total_users = db.query(models.User).count()
+    print(f'IMPORT_POSTS| {total_users=}')
+    print(f'IMPORT_POSTS| {max_rows=}')
+    rows = 0
+    for row in posts:
+        owner_id = random.randrange(1, total_users+1)
+        db.add(models.Post(**row, owner_id=owner_id))
+        rows += 1
+        if max_rows is not None and max_rows == rows:
+            break
+    db.commit()
+
