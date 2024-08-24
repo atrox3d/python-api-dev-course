@@ -25,6 +25,14 @@ from .routers import utility
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+def setup_db(max_votes:int=10):
+    helpers.db.setup_db(
+                next(get_db()),
+                models,
+                # delete_existing=True
+                max_votes=max_votes
+    )
+
 @asynccontextmanager
 async def lifespan(app:FastAPI):
     from config import LifespanSettings
@@ -32,7 +40,10 @@ async def lifespan(app:FastAPI):
     print(f'LIFESPAN| start {settings=}')
 
     if settings.reset_db:
-        setup_db()
+        if settings.max_votes is not None:
+            setup_db(settings.max_votes)
+        else:
+            setup_db()
     else:
         if settings.import_users:
             # helpers.db.import_table_from_json()
@@ -47,6 +58,7 @@ async def lifespan(app:FastAPI):
     yield
     print(f'LIFESPAN| end {settings=}')
 
+
 app = FastAPI(lifespan=lifespan)
 app.include_router(posts.router)
 app.include_router(users.router)
@@ -57,14 +69,6 @@ app.include_router(utility.router)
 
 # create db if not existing
 models.Base.metadata.create_all(bind=engine)
-
-def setup_db(max_votes:int=10):
-    helpers.db.setup_db(
-                next(get_db()),
-                models,
-                # delete_existing=True
-                max_votes=max_votes
-    )
 
 ##########################################################
 # test PRAGMA foreign_keys, on delete cascade
