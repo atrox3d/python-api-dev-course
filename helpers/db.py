@@ -1,14 +1,10 @@
 import json
 from types import ModuleType
 from typing import Callable
-from fastapi import HTTPException, status, Depends, APIRouter
+import sqlalchemy
 from sqlalchemy.orm import Session
-from pydantic import BaseModel
+import random
 
-from db.orm.sqlite import Base, SessionLocal, get_db
-from db.orm import models
-import schemas.post
-import schemas.user
 import app.utils
 import helpers.default_users
 
@@ -82,10 +78,33 @@ def hash_passwords(
         row.password = hashed_password
     db.commit()
 
+def create_votes(
+        db:Session,
+        models:ModuleType,
+        max_votes:int
+):
+    total_posts = db.query(models.Post).count()
+    print(f'CREATE_VOTES| {total_posts=}')
+    
+    total_users = db.query(models.User).count()
+    print(f'CREATE_VOTES| {total_users=}')
+
+    for _ in range(max_votes):
+        try:
+            vote = models.Vote(
+                post_id=random.randrange(1, total_posts+1),
+                user_id=random.randrange(1, total_users+1),
+            )
+            db.add(vote)
+            db.commit()
+        except sqlalchemy.exc.IntegrityError as ie:
+            print(f'CREATE_VOTES| IntegrityError on {vote.user_id=}, {vote.post_id=}')
+            db.rollback()    
 
 def setup_db(
         db:Session,
         models:ModuleType,
+        max_votes:int,
         json_provider:Callable=None,
 ):
     print(f'SETUP_DB| deleting posts')
@@ -110,4 +129,6 @@ def setup_db(
                 json_provider=json_provider
             )
     
+    print(f'SETUP_DB| creating fake votes')
+    create_votes(db, models, max_votes)
     print(f'SETUP_DB| done')
