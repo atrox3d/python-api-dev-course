@@ -104,7 +104,7 @@ app.include_router(example.router)
 app.include_router(utility.router)
 
 # create db if not existing
-models.Base.metadata.create_all(bind=engine)
+# models.Base.metadata.create_all(bind=engine)
 
 ##########################################################
 # test PRAGMA foreign_keys, on delete cascade
