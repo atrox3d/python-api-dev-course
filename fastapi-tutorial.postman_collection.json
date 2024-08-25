@@ -13,7 +13,14 @@
 					"name": "get_posts",
 					"request": {
 						"auth": {
-							"type": "inherit"
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT_TOKEN}}",
+									"type": "string"
+								}
+							]
 						},
 						"method": "GET",
 						"header": [],
@@ -245,7 +252,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "",
+							"raw": " ",
 							"options": {
 								"raw": {
 									"language": "text"
@@ -265,6 +272,48 @@
 							"path": [
 								"posts",
 								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "vote_post",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT_TOKEN}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJleHAiOjE3MjQxNDMzNzN9.gSGTsq8hQHZUkQmekP_KSCNbobLwrqD8WYFOUgwvKUw",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"checking sqlalchemy\",\n    \"content\": \"post content\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{HOST}}/posts",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"posts"
 							]
 						}
 					},
@@ -390,22 +439,153 @@
 			]
 		},
 		{
+			"name": "helpers",
+			"item": [
+				{
+					"name": "util/db/import_posts",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}/util/db/table/import/posts/from/posts.json?delete=True",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"util",
+								"db",
+								"table",
+								"import",
+								"posts",
+								"from",
+								"posts.json"
+							],
+							"query": [
+								{
+									"key": "delete",
+									"value": "True"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "util/db/import_users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}/util/db/table/import/users/from/users.json?delete=True",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"util",
+								"db",
+								"table",
+								"import",
+								"users",
+								"from",
+								"users.json"
+							],
+							"query": [
+								{
+									"key": "delete",
+									"value": "True"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "util/db/import_ALL",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}/util/db/table/import/all?delete=true",
+							"host": [
+								"{{HOST}}"
+							],
+							"path": [
+								"util",
+								"db",
+								"table",
+								"import",
+								"all"
+							],
+							"query": [
+								{
+									"key": "delete",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "home",
 			"request": {
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://127.0.0.1:8000/",
-					"protocol": "http",
+					"raw": "{{URL}}",
 					"host": [
-						"127",
-						"0",
-						"0",
-						"1"
+						"{{URL}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "example",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"data\": {\n        \"name\": \"NAME\",\n        \"age\": 20\n    },\n    \"count\": 5\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{HOST}}/example?queryparam=hello",
+					"host": [
+						"{{HOST}}"
 					],
-					"port": "8000",
 					"path": [
-						""
+						"example"
+					],
+					"query": [
+						{
+							"key": "queryparam",
+							"value": "hello"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "util/db",
+			"request": {
+				"auth": {
+					"type": "inherit"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}",
+					"host": [
+						"{{URL}}"
 					]
 				}
 			},
