@@ -169,7 +169,19 @@ def import_posts(db:Session, posts:list=None, filename:str=None, max_rows=None):
             break
     db.commit()
 
+def import_default_users(db:Session):
+    print(f'IMPORT_DEFAULT_USERS| importing default users')
+    for user in helpers.default_users.default_users:
+        db_user = models.User(**user.model_dump())
+        db_user.password = app.utils.hash(user.password)
+        db.add(db_user)
+    db.commit()
+
+
 def import_users(db:Session, users:list=None, filename:str=None, max_rows=None):
+
+    import_default_users(db)
+    
     if filename is not None:
         print(f'IMPORT_USERS| loading {filename}')
         users = load_json(filename)
