@@ -1,5 +1,6 @@
 from fastapi import HTTPException, status, Depends, APIRouter
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 import logging
 
 # sqlite
@@ -16,7 +17,7 @@ router = APIRouter(prefix='/posts', tags=['Posts'])
 
 @router.get(
         '/',
-         response_model=schemas.post.Posts
+        #  response_model=schemas.post.Posts
 )
 def get_posts(
                 db: Session = Depends(get_db),
@@ -25,7 +26,8 @@ def get_posts(
                 limit:int=10,
                 skip:int=0,
                 search:str=''
-) -> schemas.post.Posts:
+):
+# ) -> schemas.post.Posts:
     # return db.get_db_posts(conn)
     print(f'GET_POSTS| {limit=}')
     print(f'GET_POSTS| {skip=}')
@@ -37,11 +39,29 @@ def get_posts(
     # where posts.title like '%SEARCH%'
     # limit LIMIT
     # offset SKIP
+    # return (
+    #         db.query(models.Post)
+    #         .filter(models.Post.title.contains(search))
+    #         .limit(limit)
+    #         .offset(skip)
+    #         .all()
+    # )
+
+    # SELECT posts.*, COUNT(votes.post_id) as votes
+    # FROM posts LEFT JOIN votes
+    # ON posts.id = votes.post_id
+    # -- WHERE posts.id = 1
+    # GROUP BY posts.id;
     return (
-            db.query(models.Post)
-            .filter(models.Post.title.contains(search))
-            .limit(limit)
-            .offset(skip)
+            db.query(models.Post, func.count(models.Post.id).label('votes'))
+            .join(
+                    models.Vote, 
+                    models.Post.id==models.Vote.post_id,
+                    isouter=True)
+            .group_by(models.Post.id)
+            # .filter(models.Post.title.contains(search))
+            # .limit(limit)
+            # .offset(skip)
             .all()
     )
 
