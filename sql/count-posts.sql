@@ -22,9 +22,10 @@ on users.id = posts.owner_id
 GROUP BY users.id;
 
 -- the right query
-SELECT posts.*, COUNT(votes.post_id)
+SELECT posts.*, COUNT(votes.post_id) as votes
 FROM posts LEFT JOIN votes
 ON posts.id = votes.post_id
+-- WHERE posts.id = 1
 GROUP BY posts.id;
 
 
