@@ -20,3 +20,43 @@ FROM posts
 RIGHT JOIN users
 on users.id = posts.owner_id
 GROUP BY users.id;
+
+-- the right query
+SELECT posts.*, COUNT(votes.post_id)
+FROM posts LEFT JOIN votes
+ON posts.id = votes.post_id
+GROUP BY posts.id;
+
+
+-- practice
+SELECT posts.id, votes.post_id
+FROM posts LEFT JOIN votes
+ON posts.id = votes.post_id;
+
+SELECT posts.id, COUNT(*)
+FROM posts LEFT JOIN votes
+ON posts.id = votes.post_id
+GROUP BY  posts.id;
+
+SELECT posts.id, COUNT(votes.post_id)
+FROM posts LEFT JOIN votes
+ON posts.id = votes.post_id
+GROUP BY posts.id;
+
+SELECT posts.id, post.title, votes.post_id
+FROM posts LEFT JOIN votes
+ON posts.id = votes.post_id;
+
+SELECT posts.id, posts.title, COUNT(votes.post_id), users.email
+FROM posts LEFT JOIN votes
+ON posts.id = votes.post_id
+LEFT JOIN users
+ON votes.user_id == users.id
+GROUP BY votes.post_id;
+
+SELECT posts.id, posts.title,users.email
+FROM posts LEFT JOIN votes
+ON posts.id = votes.post_id
+LEFT JOIN users
+ON votes.user_id == users.id
+;
