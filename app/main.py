@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 from operator import setitem
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 import logging
 
 from helpers.toremove.db import reset_db
@@ -96,6 +97,14 @@ async def lifespan(app:FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=['*'],
+    allow_credentials=True,
+    allow_methods=['*'],
+    allow_headers=['*']
+)
+
 app.include_router(posts.router)
 app.include_router(users.router)
 app.include_router(auth.router)
