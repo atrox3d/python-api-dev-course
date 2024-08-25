@@ -28,4 +28,8 @@ class Post(PostBase):
         # orm_mode = True
     owner: user.UserOut
 
-Posts = list[Post]
+class PostOut(BaseModel):
+    Post: Post
+    votes: int
+
+Posts = list[PostOut]
