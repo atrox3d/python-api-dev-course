@@ -5,7 +5,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 
-from config import sqlite_settings
+from app.config import sqlite_settings
 
 ##################################################################
 # ENFORCE SQLITE FOREIGN KEY

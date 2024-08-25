@@ -9,7 +9,7 @@ from db.orm import models
 from db.orm.sqlite import get_db
 import schemas
 import schemas.user
-from config import sqlite_settings
+from app.config import sqlite_settings
 
 # SECRET_KEY
 # alghorytm

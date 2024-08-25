@@ -36,7 +36,7 @@ def setup_db(max_votes:int=10):
 @asynccontextmanager
 async def lifespan(app:FastAPI):
 
-    from config import LifespanSettings
+    from app.config import LifespanSettings
     settings = LifespanSettings()
     print(f'LIFESPAN| start {settings=}')
 
