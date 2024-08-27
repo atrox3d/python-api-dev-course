@@ -1,5 +1,7 @@
 from fastapi.testclient import TestClient
+
 from app.main import app
+import schemas.user
 
 client = TestClient(app)
 
@@ -16,6 +18,7 @@ def test_create_user():
                     'password': 'password'
                 }
     )
-    print(response.json())
     assert response.status_code == 201
+    user = schemas.user.UserOut(**response.json())
+    assert user.email == 'testuser@gmail.com'
 
