@@ -1,3 +1,4 @@
+import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
@@ -38,7 +39,7 @@ TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engin
 
 # not needed, we use the original base
 # Base = declarative_base()
-Base.metadata.create_all(bind=engine)
+# Base.metadata.create_all(bind=engine)
 
 # create override Dependency
 def override_get_db():
@@ -51,21 +52,24 @@ def override_get_db():
 # override app dependecy with the new get_db which points to testdb
 app.dependency_overrides[get_db] = override_get_db
 
+@pytest.fixture
+def client():
+    print()
+    
+    print(f'CLIENT FIXTURE| dropping tables')
+    Base.metadata.drop_all(bind=engine)
 
+    print(f'CLIENT FIXTURE| creating tables')
+    Base.metadata.create_all(bind=engine)
+    
+    yield TestClient(app)
 
-
-
-
-
-
-client = TestClient(app)
-
-def test_root():
+def test_root(client):
     response = client.get('/')
     assert response.status_code == 200
     assert response.json().get('message') == 'welcome to my api'
 
-def test_create_user():
+def test_create_user(client):
     response = client.post(
                 '/users',
                 json={
