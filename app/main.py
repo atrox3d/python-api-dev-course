@@ -36,23 +36,31 @@ def setup_db(max_votes:int=10):
 
 @asynccontextmanager
 async def lifespan(app:FastAPI):
+    ''' enable/disable switches from .lifespan.env property file'''
 
     from app.config import LifespanSettings
     settings = LifespanSettings()
     print(f'LIFESPAN| start {settings=}')
 
     if settings.reset_db:
+        #
+        # this will delete all tables and recreate example data
+        #
         print(f'LIFESPAN| reset_db({settings.max_votes=})')
         if settings.max_votes is not None:
-            setup_db(settings.max_votes)
+            setup_db(settings.max_votes)    # specify max generated votes
         else:
-            setup_db()
+            setup_db()                      # use default max votes
     else:
-        #
-        # deleting users also deletes posts, cascade
-        #
         if settings.import_users and settings.json_users:
+            #
+            # this will import users from json and optionally delete previews users
+            # of course if we import the same users this will violate integrity
+            #
             if settings.delete_users:
+                #
+                # this will delete users table and related posts cascade
+                #
                 print(f'LIFESPAN| delete users')
                 helpers.db.delete_all_records(
                     next(get_db()),
@@ -66,7 +74,13 @@ async def lifespan(app:FastAPI):
             )
 
         if settings.import_posts and settings.json_posts:
+            #
+            # this will import posts from json and optionally delete previews posts
+            #
             if settings.delete_posts:
+                #
+                # this will delete existing posts
+                #
                 print(f'LIFESPAN| delete posts')
                 helpers.db.delete_all_records(
                     next(get_db()),
@@ -80,6 +94,10 @@ async def lifespan(app:FastAPI):
             )
         
         if settings.fake_votes and settings.max_votes:
+            #
+            # this will randomly create likes to posts
+            # any integrity violation is ignored
+            #
             print(f'LIFESPAN| delete votes')
             helpers.db.delete_all_records(
                 next(get_db()),
