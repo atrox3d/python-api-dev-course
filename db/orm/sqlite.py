@@ -7,15 +7,15 @@ from sqlalchemy.orm import sessionmaker
 
 from app.config import sqlite_settings
 
-##################################################################
-# ENFORCE SQLITE FOREIGN KEY
-# https://stackoverflow.com/a/77708922
-##################################################################
 from sqlalchemy.engine import Engine
 from sqlalchemy import event
 
 @event.listens_for(Engine, "connect")
 def set_sqlite_pragma(dbapi_connection, connection_record):
+    '''
+    ENFORCE SQLITE FOREIGN KEY
+    https://stackoverflow.com/a/77708922
+    '''
     cursor = dbapi_connection.cursor()
     cursor.execute("PRAGMA foreign_keys=ON")
     cursor.close()

@@ -7,3 +7,5 @@ social.db
 
 *.json
 !fastapi-tutorial.postman_collection.json
+testsocial.db
+testsocial.db
