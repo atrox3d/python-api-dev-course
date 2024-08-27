@@ -30,10 +30,11 @@ def login(
         ).first()
     # print(f'LOGIN| user = { {c.name:getattr(user, c.name) for c in user.__table__.columns}} ')
     # check if user found in db
-    print(f'LOGIN| {user.id         = }')
-    print(f'LOGIN| {user.email      = }')
-    print(f'LOGIN| {user.password   = }')
-    print(f'LOGIN| {user.created_at = }')
+    if user:
+        print(f'LOGIN| {user.id         = }')
+        print(f'LOGIN| {user.email      = }')
+        print(f'LOGIN| {user.password   = }')
+        print(f'LOGIN| {user.created_at = }')
     if not user:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
                             detail='invalid credentials')

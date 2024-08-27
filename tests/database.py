@@ -1,3 +1,4 @@
+import random
 from typing import Generator
 import pytest
 from fastapi.testclient import TestClient
@@ -11,6 +12,8 @@ import sqlalchemy.orm.session
 from app.main import app
 # from app.config import sqlite_settings
 from db.orm.sqlite import get_db, Base
+
+debug = print
 
 @event.listens_for(Engine, "connect")
 def set_sqlite_pragma(dbapi_connection, connection_record):
@@ -56,40 +59,43 @@ TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engin
 
 @pytest.fixture
 def session() -> Generator[sqlalchemy.orm.session.Session, None, None]:
-    print()
+    debug()
     
     # prepare db for testing
-    print(f'SESSION FIXTURE| dropping tables')
+    debug(f'SESSION FIXTURE| dropping tables')
     Base.metadata.drop_all(bind=engine)
-    print(f'SESSION FIXTURE| creating tables')
+    debug(f'SESSION FIXTURE| creating tables')
     Base.metadata.create_all(bind=engine)
 
-    print(f'SESSION FIXTURE| creating session')
+    debug(f'SESSION FIXTURE| creating session')
     db = TestingSessionLocal()
     try:
-        print(f'SESSION FIXTURE| yielding session')
+        debug(f'SESSION FIXTURE| yielding session')
+        db.rand = random.random()
+        debug(f'\nSESSION_FIXTURE| {db.rand = }', force=False)
         yield db
     finally:
-        print()
-        print(f'SESSION FIXTURE| closing session')
+        debug()
+        debug(f'SESSION FIXTURE| closing session')
         db.close()
 
 @pytest.fixture
 def client(session) -> Generator[TestClient, None, None]:
-    print(f'CLIENT FIXTURE| using session fixture')
+    debug(f'CLIENT FIXTURE| using session fixture')
+    debug(f'\nCLIENT_FIXTURE| {session.rand = }', force=False)
     def override_get_db():
         # db = TestingSessionLocal()
         try:
-            print(f'OVERRIDE_GET_DB| yielding session')
+            debug(f'OVERRIDE_GET_DB| yielding session')
             yield session
         finally:
-            print()
-            print(f'OVERRIDE_GET_DB| closing session')
+            debug()
+            debug(f'OVERRIDE_GET_DB| closing session')
             session.close()
     
-    print(f'CLIENT FIXTURE| overriding get_db')
+    debug(f'CLIENT FIXTURE| overriding get_db')
     app.dependency_overrides[get_db] = override_get_db
     
-    print(f'CLIENT FIXTURE| yielding new test client')
+    debug(f'CLIENT FIXTURE| yielding new test client')
     yield TestClient(app)
     # leave db untouched after test
