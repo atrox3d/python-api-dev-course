@@ -58,7 +58,10 @@ def create_access_token(data:dict):
 
     return token
 
-def verify_access_token(token:str, credentials_exception:Exception):
+def verify_access_token(
+                        token:str, 
+                        credentials_exception:Exception
+) -> schemas.user.TokenData:
     
     print(f'TOKEN|VERIFY| {token    = }')
     
@@ -90,22 +93,28 @@ oauth2_scheme = OAuth2PasswordBearer(
                         tokenUrl='login'
 )
 
+unhautorized_exception = HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail='unhautorized: invalid credentials',
+                    headers={"WWW-Authenticate": "Bearer"},
+)
+
 def get_current_user(
         token:str = Depends(oauth2_scheme),  # inject token,
         db: Session = Depends(get_db)
         # request: Request = Depends()
-):
+) -> models.User:
     print(f'GET_CURRENT_USER| {oauth2_scheme.__dict__ = }')
     # print(f'GET_CURRENT_USER| {oauth2_scheme() = }')
-    print(f'GET_CURRENT_USER| create exception')
-    unhautorized = HTTPException(
-                        status_code=status.HTTP_401_UNAUTHORIZED,
-                        detail='unhautorized: invalid credentials',
-                        headers={"WWW-Authenticate": "Bearer"},
-    )
+    # print(f'GET_CURRENT_USER| create exception')
+    # unhautorized = HTTPException(
+    #                     status_code=status.HTTP_401_UNAUTHORIZED,
+    #                     detail='unhautorized: invalid credentials',
+    #                     headers={"WWW-Authenticate": "Bearer"},
+    # )
     # https://youtu.be/0sOvCWFmrtA?si=Dh1sIirAYVL4Si4h&t=26702
     print(f'GET_CURRENT_USER| call verify_access_token')
-    token = verify_access_token(token, unhautorized)
+    token = verify_access_token(token, unhautorized_exception)
     print(f'GET_CURRENT_USER| {token = }')
     print(f'GET_CURRENT_USER| {token == 1 = }')
     # get user from db

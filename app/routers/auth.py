@@ -19,7 +19,7 @@ def login(
                     Depends(),      # get username+password from form data
                                     # instead of JSON
             db: Session = Depends(get_db)
-):
+) -> schemas.user.Token:
     print(f'LOGIN| credentials = {credentials.__dict__}')
     print(f'LOGIN| {credentials.username = }')
     print(f'LOGIN| {credentials.password = }')
@@ -55,8 +55,11 @@ def login(
         }
     )
     # return JSON with encoded token
-    return {'token': token, 'token_type': 'bearer'}
-
+    # return {'token': token, 'token_type': 'bearer'}
+    return schemas.user.Token(
+        access_token=token,
+        token_type='bearer'
+    )
 
 
 

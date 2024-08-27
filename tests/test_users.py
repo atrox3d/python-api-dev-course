@@ -3,6 +3,7 @@ import pytest
 import schemas.user
 import tests.database
 from tests.database import client, session
+import app.oauth2
 
 
 
@@ -31,6 +32,20 @@ def user_login_json(user_create) -> dict[str, str]:
         'password': user_create.password
     }
 
+@pytest.fixture
+def new_user(client, user_create, user_create_json) -> schemas.user.UserDb:
+    response = client.post(
+                        '/users',
+                        json=user_create_json
+    )
+    assert response.status_code == 201
+    userdb = schemas.user.UserDb(
+        **response.json(),
+        password=user_create.password
+    )
+    return userdb
+
+
 # session fixture is cached
 def test_root(client, session):
     debug(f'\nTEST_ROOT| {session.rand = }', force=False)
@@ -52,7 +67,7 @@ def test_create_user(client, session, user_create_json):
     assert user.email == 'testuser@gmail.com'
 
 # session fixture is cached
-def test_login_user(client, session, user_login_json):
+def test_login(client, session, user_login_json, new_user):
     debug(f'\nTEST_LOGIN_USER| {session.rand = }', force=False)
     debug()
     debug(f'TEST_LOGIN_USER| get_user')
@@ -63,7 +78,12 @@ def test_login_user(client, session, user_login_json):
     )
     print(response)
     print(response.json())
-    # assert response.status_code == 200
-    # user = schemas.user.UserOut(**response.json())
-    # assert user.email == 'testuser@gmail.com'
+    token = schemas.user.Token(
+        **response.json()
+    )
+    tokendata = app.oauth2.verify_access_token(
+        token.access_token,
+        app.oauth2.unhautorized_exception
+    )
+    assert tokendata.id == new_user.id
 
