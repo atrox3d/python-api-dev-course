@@ -56,13 +56,14 @@ app.dependency_overrides[get_db] = override_get_db
 def client():
     print()
     
+    # prepare db for testing
     print(f'CLIENT FIXTURE| dropping tables')
     Base.metadata.drop_all(bind=engine)
-
     print(f'CLIENT FIXTURE| creating tables')
     Base.metadata.create_all(bind=engine)
     
     yield TestClient(app)
+    # leave db untouched after test
 
 def test_root(client):
     response = client.get('/')
