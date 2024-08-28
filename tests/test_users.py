@@ -1,18 +1,11 @@
 import pytest
 
 import schemas.user
-import tests.database
-from tests.database import client, session
+# import tests.database
+# from tests.database import client, session
 import app.oauth2
-
-
-
-DEBUG = False
-def debug(*args, force=False, **kwargs):
-    if DEBUG or force:
-        print(*args, **kwargs)
-
-tests.database.debug = debug
+from tests.debug import debug
+import tests.debug
 
 @pytest.fixture
 def user_create() -> schemas.user.UserCreate:
@@ -49,6 +42,8 @@ def new_user(client, user_create, user_create_json) -> schemas.user.UserDb:
     )
     return userdb
 
+def  setup_module():
+    tests.debug.DEBUG = False
 
 # session fixture is cached
 def test_root(client, session):

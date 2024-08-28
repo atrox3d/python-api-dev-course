@@ -12,8 +12,9 @@ import sqlalchemy.orm.session
 from app.main import app
 # from app.config import sqlite_settings
 from db.orm.sqlite import get_db, Base
-
-debug = print
+from tests.debug import debug
+import tests.debug
+# _debug = print
 
 @event.listens_for(Engine, "connect")
 def set_sqlite_pragma(dbapi_connection, connection_record):
