@@ -1,5 +1,9 @@
+from typing import Generator
+from fastapi.testclient import TestClient
 import pytest
 import schemas, schemas.user
+from app import oauth2
+from .database import client
 
 @pytest.fixture
 def user_create() -> schemas.user.UserCreate:
@@ -35,3 +39,15 @@ def new_user(client, user_create, user_create_json) -> schemas.user.UserDb:
         password=user_create.password
     )
     return userdb
+
+@pytest.fixture
+def token(new_user) -> str:
+    return oauth2.create_access_token({'user_id': new_user.id})
+
+@pytest.fixture
+def authorized_client(client, token) -> Generator[TestClient, None, None]:
+     client.headers = {
+         **client.headers,
+         'Authorization': f'Bearer {token}'
+     }
+     yield client
