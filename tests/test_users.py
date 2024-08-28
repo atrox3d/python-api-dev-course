@@ -9,7 +9,7 @@ import tests.debug
 
 
 def  setup_module():
-    tests.debug.DEBUG = False
+    tests.debug.DEBUG = True
 
 # session fixture is cached
 def test_root(client, session):
