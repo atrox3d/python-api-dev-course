@@ -25,4 +25,7 @@ def test_get_all_posts(authorized_client, add_fake_posts):
         assert post.created_at == dbpost.created_at
         assert post.owner_id == dbpost.owner_id
 
-        
+def test_unauthorized_get_all_posts(client, add_fake_posts):
+    response = client.get('/posts')
+    assert response.status_code == 401
+
