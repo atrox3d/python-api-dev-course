@@ -109,3 +109,28 @@ def test_create_post_default_published_true(
     assert post.published == True
     assert post.owner_id == new_user.id
     assert post.owner.email == new_user.email
+
+def test_unauthorized_create_post(client):
+    response = client.post(
+                        f'/posts',
+                        json=dict(
+                            title='nope',
+                            content='nope'
+                        )
+    )
+    assert response.status_code == 401
+
+def test_unauthorized_delete_post(client, add_fake_posts):
+    response = client.delete(f'/posts/{add_fake_posts[0].id}')
+    assert response.status_code == 401
+
+def test_delete_post(authorized_client, add_fake_posts):
+    response = authorized_client.delete(f'/posts/{add_fake_posts[0].id}')
+    assert response.status_code == 204
+
+def test_delete_post_not_exist(authorized_client, add_fake_posts):
+    response = authorized_client.delete(f'/posts/-1')
+    assert response.status_code == 404
+
+def test_delete_owned_post():
+    pass
