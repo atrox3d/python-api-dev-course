@@ -52,13 +52,15 @@ def get_posts(
     # ON posts.id = votes.post_id
     # -- WHERE posts.id = 1
     # GROUP BY posts.id;
-    return (
-            db.query(models.Post, func.count(models.Post.id).label('votes'))
+    query = (db.query(models.Post, func.count(models.Vote.post_id).label('votes'))
             .join(
                     models.Vote, 
                     models.Post.id==models.Vote.post_id,
                     isouter=True)
-            .group_by(models.Post.id)
+            .group_by(models.Post.id))
+    print(f'{query = !s}')
+    return (
+            query
             # .filter(models.Post.title.contains(search))
             # .limit(limit)
             # .offset(skip)

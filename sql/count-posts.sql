@@ -28,6 +28,13 @@ ON posts.id = votes.post_id
 -- WHERE posts.id = 1
 GROUP BY posts.id;
 
+-- fixed vote count in sqlalchemy
+SELECT posts.id AS posts_id, posts.title AS posts_title, 
+posts.content AS posts_content, posts.published AS posts_published, 
+posts.created_at AS posts_created_at, posts.owner_id AS posts_owner_id, 
+count(votes.post_id) AS votes 
+FROM posts LEFT OUTER JOIN votes 
+ON posts.id = votes.post_id GROUP BY posts.id
 
 -- practice
 SELECT posts.id, votes.post_id
