@@ -14,5 +14,11 @@ from .fixtures.user import (
 from .fixtures.fakedata import(
                             fake_posts,
                             fake_models_db,
-                            add_fake_posts_db
+                            add_fake_posts_db,
+                            fake_emails_dict,
+                            fake_usernames_dict,
+                            fake_passwords_dict,
+                            fake_users_creation_dict,
+                            fake_users_login_dict
 )
+

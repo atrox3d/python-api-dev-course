@@ -132,5 +132,6 @@ def test_delete_post_not_exist(authorized_client, add_fake_posts_db):
     response = authorized_client.delete(f'/posts/-1')
     assert response.status_code == 404
 
-def test_delete_owned_post():
-    pass
+def test_delete_owned_post(fake_users_creation_dict, fake_users_login_dict):
+    print(fake_users_creation_dict)
+    print(fake_users_login_dict)
