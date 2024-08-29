@@ -29,3 +29,7 @@ def test_unauthorized_get_all_posts(client, add_fake_posts):
     response = client.get('/posts')
     assert response.status_code == 401
 
+def test_unauthorized_get_one_posts(client, add_fake_posts):
+    response = client.get(f'/posts/{add_fake_posts[0].id}')
+    assert response.status_code == 401
+

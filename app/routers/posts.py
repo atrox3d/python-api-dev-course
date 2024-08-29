@@ -106,7 +106,8 @@ def create_post(
 def get_post(
                 id:int, 
                 # response: Response
-                db: Session = Depends(get_db)
+                db: Session = Depends(get_db),
+                current_user: models.User = Depends(oauth2.get_current_user)
 ) -> schemas.post.Post:
     # post = db.find_db_post(conn, id)
     print('retrieving post')
