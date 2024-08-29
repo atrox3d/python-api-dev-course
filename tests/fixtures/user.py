@@ -6,11 +6,10 @@ from app import oauth2
 from .database import unauthorized_client
 
 @pytest.fixture
-def user_creation_schema(fake_users_dict) -> schemas.user.UserCreate:
+def user_creation_schema(fake_users_creation_dict) -> schemas.user.UserCreate:
     ''' returns a UserCreate instance for validation/input'''
     return schemas.user.UserCreate(
-        email='testuser@gmail.com',
-        password='password'
+        **fake_users_creation_dict[0]
     )
 
 @pytest.fixture
