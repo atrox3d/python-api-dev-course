@@ -1,12 +1,16 @@
+import email
 import json
 
+import pytest
+
 # from app.routers import posts
+from app.routers import auth
 import tests.debug
 import schemas.post
 
 
 def  setup_module():
-    tests.debug.DEBUG = True
+    tests.debug.DEBUG = False
 
 def test_get_all_posts(authorized_client, add_fake_posts):
     response = authorized_client.get('/posts')
@@ -29,7 +33,79 @@ def test_unauthorized_get_all_posts(client, add_fake_posts):
     response = client.get('/posts')
     assert response.status_code == 401
 
-def test_unauthorized_get_one_posts(client, add_fake_posts):
+def test_unauthorized_get_one_post(client, add_fake_posts):
     response = client.get(f'/posts/{add_fake_posts[0].id}')
     assert response.status_code == 401
 
+def test_get_one_posts_not_exist(authorized_client, add_fake_posts):
+    response = authorized_client.get(
+        f'/posts/-1')
+    assert response.status_code == 404
+
+def test_get_one_post(authorized_client, add_fake_posts):
+    response = authorized_client.get(f'/posts/{add_fake_posts[0].id}')
+    assert response.status_code == 200
+    post = schemas.post.Post(**response.json())
+    assert post.id == add_fake_posts[0].id
+
+@pytest.mark.parametrize(
+        'title, content, published',
+        [
+            ('new title', 'new content', True),
+            ('new second title', 'new second content', False),
+            ('new third title', 'new third content', True),
+        ]
+)
+def test_create_post(
+                    authorized_client,
+                    new_user,
+                    add_fake_posts,
+                    title,
+                    content,
+                    published
+):
+    response = authorized_client.post(
+                'posts',
+                json=dict(
+                    title=title,
+                    content=content,
+                    published=published
+                )
+    )
+    assert response.status_code == 201
+    post = schemas.post.Post(**response.json())
+    assert post.title == title
+    assert post.content == content
+    assert post.published == published
+    assert post.owner_id == new_user.id
+    assert post.owner.email == new_user.email
+
+@pytest.mark.parametrize(
+        'title, content',
+        [
+            ('new title', 'new content'),
+            ('new second title', 'new second content'),
+            ('new third title', 'new third content'),
+        ]
+)
+def test_create_post_default_published_true(
+                    authorized_client,
+                    new_user,
+                    add_fake_posts,
+                    title,
+                    content,
+):
+    response = authorized_client.post(
+                'posts',
+                json=dict(
+                    title=title,
+                    content=content,
+                )
+    )
+    assert response.status_code == 201
+    post = schemas.post.Post(**response.json())
+    assert post.title == title
+    assert post.content == content
+    assert post.published == True
+    assert post.owner_id == new_user.id
+    assert post.owner.email == new_user.email
