@@ -58,7 +58,7 @@ def get_posts(
                     models.Post.id==models.Vote.post_id,
                     isouter=True)
             .group_by(models.Post.id))
-    print(f'{query = !s}')
+    # print(f'{query = !s}')
     return (
             query
             # .filter(models.Post.title.contains(search))

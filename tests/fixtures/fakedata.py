@@ -18,3 +18,8 @@ def fake_models_post(fake_create_posts, new_user) -> list[models.Post]:
     return [models.Post(**_post.model_dump(), owner_id=new_user.id) 
             for _post in fake_create_posts]
 
+@pytest.fixture
+def add_fake_posts(session, fake_models_post) -> list[models.Post]:
+    session.add_all(fake_models_post)
+    session.commit()
+    return session.query(models.Post).all()

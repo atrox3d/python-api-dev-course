@@ -13,5 +13,6 @@ from .fixtures.user import (
 
 from .fixtures.fakedata import(
                             fake_create_posts,
-                            fake_models_post
+                            fake_models_post,
+                            add_fake_posts
 )
