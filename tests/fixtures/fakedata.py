@@ -14,8 +14,8 @@ def fake_posts() -> list[post.PostCreate]:
     ]
 
 @pytest.fixture
-def fake_models_db(fake_posts, new_user_db) -> list[models.Post]:
-    return [models.Post(**_post.model_dump(), owner_id=new_user_db.id) 
+def fake_models_db(fake_posts, add_user_db) -> list[models.Post]:
+    return [models.Post(**_post.model_dump(), owner_id=add_user_db.id) 
             for _post in fake_posts]
 
 @pytest.fixture

@@ -58,7 +58,7 @@ def test_get_one_post(authorized_client, add_fake_posts_db):
 )
 def test_create_post(
                     authorized_client,
-                    new_user_db,
+                    add_user_db,
                     add_fake_posts_db,
                     title,
                     content,
@@ -77,8 +77,8 @@ def test_create_post(
     assert post.title == title
     assert post.content == content
     assert post.published == published
-    assert post.owner_id == new_user_db.id
-    assert post.owner.email == new_user_db.email
+    assert post.owner_id == add_user_db.id
+    assert post.owner.email == add_user_db.email
 
 @pytest.mark.parametrize(
         'title, content',
@@ -90,7 +90,7 @@ def test_create_post(
 )
 def test_create_post_default_published_true(
                     authorized_client,
-                    new_user_db,
+                    add_user_db,
                     add_fake_posts_db,
                     title,
                     content,
@@ -107,8 +107,8 @@ def test_create_post_default_published_true(
     assert post.title == title
     assert post.content == content
     assert post.published == True
-    assert post.owner_id == new_user_db.id
-    assert post.owner.email == new_user_db.email
+    assert post.owner_id == add_user_db.id
+    assert post.owner.email == add_user_db.email
 
 def test_unauthorized_create_post(unauthorized_client):
     response = unauthorized_client.post(
@@ -132,6 +132,7 @@ def test_delete_post_not_exist(authorized_client, add_fake_posts_db):
     response = authorized_client.delete(f'/posts/-1')
     assert response.status_code == 404
 
-def test_delete_owned_post(fake_users_creation_dict, fake_users_login_dict):
-    print(fake_users_creation_dict)
-    print(fake_users_login_dict)
+def test_delete_owned_post(add_users_db, authorized_client):
+    # for user in add_users_db:
+        # authorized_client
+    pass

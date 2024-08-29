@@ -3,12 +3,13 @@ from .fixtures.database import (
                                 unauthorized_client
 )
 from .fixtures.user import (
-                            new_user_db, 
+                            add_user_db, 
                             user_creation_schema, 
                             user_creation_json, 
                             user_login_json,
                             token,
-                            authorized_client
+                            authorized_client,
+                            add_users_db
 )
 
 from .fixtures.fakedata import(

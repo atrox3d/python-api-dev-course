@@ -26,7 +26,7 @@ def user_login_json(user_creation_schema) -> dict[str, str]:
     }
 
 @pytest.fixture
-def new_user_db(unauthorized_client, user_creation_schema, user_creation_json) -> schemas.user.UserDb:
+def add_user_db(unauthorized_client, user_creation_schema, user_creation_json) -> schemas.user.UserDb:
     ''' creates new user and return model of it from db '''
     response = unauthorized_client.post(
                         '/users',
@@ -40,8 +40,25 @@ def new_user_db(unauthorized_client, user_creation_schema, user_creation_json) -
     return userdb
 
 @pytest.fixture
-def token(new_user_db) -> str:
-    return oauth2.create_access_token({'user_id': new_user_db.id})
+def add_users_db(unauthorized_client, fake_users_creation_dict) -> schemas.user.UserDb:
+    new_users = []
+    for user_creds in fake_users_creation_dict:
+        ''' creates new user and return model of it from db '''
+        response = unauthorized_client.post(
+                            '/users',
+                            json=user_creds
+        )
+        assert response.status_code == 201
+        userdb = schemas.user.UserDb(
+            **response.json(),
+            password=user_creds['password']
+        )
+        new_users.append(userdb)
+    return new_users
+
+@pytest.fixture
+def token(add_user_db) -> str:
+    return oauth2.create_access_token({'user_id': add_user_db.id})
 
 @pytest.fixture
 def authorized_client(unauthorized_client, token) -> Generator[TestClient, None, None]:
