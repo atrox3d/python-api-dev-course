@@ -3,16 +3,16 @@ from .fixtures.database import (
                                 client
 )
 from .fixtures.user import (
-                            new_user, 
-                            user_create, 
-                            user_create_json, 
+                            new_user_db, 
+                            user_creation_schema, 
+                            user_creation_json, 
                             user_login_json,
                             token,
                             authorized_client
 )
 
 from .fixtures.fakedata import(
-                            fake_create_posts,
-                            fake_models_post,
-                            add_fake_posts
+                            fake_posts,
+                            fake_models_db,
+                            add_fake_posts_db
 )

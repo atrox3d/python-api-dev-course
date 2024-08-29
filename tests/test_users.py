@@ -19,20 +19,20 @@ def test_root(client, session):
     assert response.json().get('message') == 'welcome to my api'
 
 # session fixture is cached
-def test_create_user(client, session, user_create_json):
+def test_create_user(client, session, user_creation_json):
     debug(f'\nTEST_CREATE_USER| {session.rand = }', force=False)
     debug()
     debug(f'TEST_CREATE_USER| get_user')
     response = client.post(
                         '/users',
-                        json=user_create_json
+                        json=user_creation_json
     )
     assert response.status_code == 201
     user = schemas.user.UserOut(**response.json())
     assert user.email == 'testuser@gmail.com'
 
 # session fixture is cached
-def test_login(client, session, user_login_json, new_user):
+def test_login(client, session, user_login_json, new_user_db):
     debug(f'\nTEST_LOGIN_USER| {session.rand = }', force=False)
     debug()
     debug(f'TEST_LOGIN_USER| get_user')
@@ -50,5 +50,5 @@ def test_login(client, session, user_login_json, new_user):
         token.access_token,
         app.oauth2.unhautorized_exception
     )
-    assert tokendata.id == new_user.id
+    assert tokendata.id == new_user_db.id
 

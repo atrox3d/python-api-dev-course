@@ -6,7 +6,7 @@ from app import oauth2
 from .database import client
 
 @pytest.fixture
-def user_create() -> schemas.user.UserCreate:
+def user_creation_schema() -> schemas.user.UserCreate:
     ''' returns a UserCreate instance for validation/input'''
     return schemas.user.UserCreate(
         email='testuser@gmail.com',
@@ -14,35 +14,35 @@ def user_create() -> schemas.user.UserCreate:
     )
 
 @pytest.fixture
-def user_create_json(user_create) -> dict[str, str]:
+def user_creation_json(user_creation_schema) -> dict[str, str]:
     ''' returns json of user_create '''
-    return user_create.model_dump()
+    return user_creation_schema.model_dump()
 
 @pytest.fixture
-def user_login_json(user_create) -> dict[str, str]:
+def user_login_json(user_creation_schema) -> dict[str, str]:
     ''' returns converted user_create for login '''
     return {
-        'username': user_create.email, 
-        'password': user_create.password
+        'username': user_creation_schema.email, 
+        'password': user_creation_schema.password
     }
 
 @pytest.fixture
-def new_user(client, user_create, user_create_json) -> schemas.user.UserDb:
+def new_user_db(client, user_creation_schema, user_creation_json) -> schemas.user.UserDb:
     ''' creates new user and return model of it from db '''
     response = client.post(
                         '/users',
-                        json=user_create_json
+                        json=user_creation_json
     )
     assert response.status_code == 201
     userdb = schemas.user.UserDb(
         **response.json(),
-        password=user_create.password
+        password=user_creation_schema.password
     )
     return userdb
 
 @pytest.fixture
-def token(new_user) -> str:
-    return oauth2.create_access_token({'user_id': new_user.id})
+def token(new_user_db) -> str:
+    return oauth2.create_access_token({'user_id': new_user_db.id})
 
 @pytest.fixture
 def authorized_client(client, token) -> Generator[TestClient, None, None]:
