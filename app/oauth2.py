@@ -1,4 +1,4 @@
-from jose import JWTError, jwt
+from jose import JWTError, jwt, ExpiredSignatureError
 from datetime import datetime, timedelta, UTC
 from fastapi import Depends, Request, status, HTTPException
 from fastapi.security import OAuth2PasswordBearer
@@ -83,6 +83,16 @@ def verify_access_token(
 
         return token_data
 
+    except ExpiredSignatureError: # <---- this one
+        #
+        # jwt already checks exp field for token expiration
+        #
+        raise HTTPException(
+                status_code=403, 
+                detail=f"token has been expired: {datetime.fromtimestamp(
+                    payload.get('exp')
+                )}"
+        )
     except JWTError as jwte:
         print(f'TOKEN|VERIFY| {jwte       = }')
         raise credentials_exception
@@ -92,6 +102,11 @@ def verify_access_token(
 oauth2_scheme = OAuth2PasswordBearer(
                         tokenUrl='login'
 )
+
+# token_expired_exception = HTTPException(
+#                     status_code=403, 
+#                     detail="token has been expired"
+# )
 
 unhautorized_exception = HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
