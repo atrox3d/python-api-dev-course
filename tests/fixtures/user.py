@@ -40,14 +40,14 @@ def add_user_db(unauthorized_client, user_creation_schema, user_creation_json) -
     return userdb
 
 @pytest.fixture
-def add_users_db(request, unauthorized_client, fake_users_creation_dict) -> schemas.user.UserDb:
+def add_users_db(request, add_user_db,  unauthorized_client, fake_users_creation_dict) -> schemas.user.UserDb:
     new_users = []
-    if 'add_user_db' in request.fixturenames:
-        users = fake_users_creation_dict[1:]
-    else:
-        users = fake_users_creation_dict
+    # if 'add_user_db' in request.fixturenames:
+    # users = fake_users_creation_dict[1:]
+    # else:
+        # users = fake_users_creation_dict
     
-    for user_creds in users:
+    for user_creds in fake_users_creation_dict[1:]:
         ''' creates new user and return model of it from db '''
         response = unauthorized_client.post(
                             '/users',
