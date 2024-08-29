@@ -81,7 +81,7 @@ def session() -> Generator[sqlalchemy.orm.session.Session, None, None]:
         db.close()
 
 @pytest.fixture
-def client(session) -> Generator[TestClient, None, None]:
+def unauthorized_client(session) -> Generator[TestClient, None, None]:
     debug(f'CLIENT FIXTURE| using session fixture')
     debug(f'\nCLIENT_FIXTURE| {session.rand = }', force=False)
     def override_get_db():

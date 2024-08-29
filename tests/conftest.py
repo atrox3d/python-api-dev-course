@@ -1,6 +1,6 @@
 from .fixtures.database import (
                                 session, 
-                                client
+                                unauthorized_client
 )
 from .fixtures.user import (
                             new_user_db, 

@@ -29,12 +29,12 @@ def test_get_all_posts(authorized_client, add_fake_posts_db):
         assert post.created_at == dbpost.created_at
         assert post.owner_id == dbpost.owner_id
 
-def test_unauthorized_get_all_posts(client, add_fake_posts_db):
-    response = client.get('/posts')
+def test_unauthorized_get_all_posts(unauthorized_client, add_fake_posts_db):
+    response = unauthorized_client.get('/posts')
     assert response.status_code == 401
 
-def test_unauthorized_get_one_post(client, add_fake_posts_db):
-    response = client.get(f'/posts/{add_fake_posts_db[0].id}')
+def test_unauthorized_get_one_post(unauthorized_client, add_fake_posts_db):
+    response = unauthorized_client.get(f'/posts/{add_fake_posts_db[0].id}')
     assert response.status_code == 401
 
 def test_get_one_posts_not_exist(authorized_client, add_fake_posts_db):
@@ -110,8 +110,8 @@ def test_create_post_default_published_true(
     assert post.owner_id == new_user_db.id
     assert post.owner.email == new_user_db.email
 
-def test_unauthorized_create_post(client):
-    response = client.post(
+def test_unauthorized_create_post(unauthorized_client):
+    response = unauthorized_client.post(
                         f'/posts',
                         json=dict(
                             title='nope',
@@ -120,8 +120,8 @@ def test_unauthorized_create_post(client):
     )
     assert response.status_code == 401
 
-def test_unauthorized_delete_post(client, add_fake_posts_db):
-    response = client.delete(f'/posts/{add_fake_posts_db[0].id}')
+def test_unauthorized_delete_post(unauthorized_client, add_fake_posts_db):
+    response = unauthorized_client.delete(f'/posts/{add_fake_posts_db[0].id}')
     assert response.status_code == 401
 
 def test_delete_post(authorized_client, add_fake_posts_db):

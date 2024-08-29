@@ -3,7 +3,7 @@ from fastapi.testclient import TestClient
 import pytest
 import schemas, schemas.user
 from app import oauth2
-from .database import client
+from .database import unauthorized_client
 
 @pytest.fixture
 def user_creation_schema() -> schemas.user.UserCreate:
@@ -27,9 +27,9 @@ def user_login_json(user_creation_schema) -> dict[str, str]:
     }
 
 @pytest.fixture
-def new_user_db(client, user_creation_schema, user_creation_json) -> schemas.user.UserDb:
+def new_user_db(unauthorized_client, user_creation_schema, user_creation_json) -> schemas.user.UserDb:
     ''' creates new user and return model of it from db '''
-    response = client.post(
+    response = unauthorized_client.post(
                         '/users',
                         json=user_creation_json
     )
@@ -45,9 +45,9 @@ def token(new_user_db) -> str:
     return oauth2.create_access_token({'user_id': new_user_db.id})
 
 @pytest.fixture
-def authorized_client(client, token) -> Generator[TestClient, None, None]:
-     client.headers = {
-         **client.headers,
+def authorized_client(unauthorized_client, token) -> Generator[TestClient, None, None]:
+     unauthorized_client.headers = {
+         **unauthorized_client.headers,
          'Authorization': f'Bearer {token}'
      }
-     yield client
+     yield unauthorized_client
