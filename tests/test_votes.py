@@ -35,4 +35,8 @@ def test_authorized_vote(session, authorized_client, token, add_fake_posts_db_mu
     assert votedb.post_id == vote.post_id
     assert votedb.post_id == owner_id
 
+def test_unauthorized_vote(session, unauthorized_client, token, add_fake_posts_db_multiple_users):
+    pass
 
+def test_duplicate_vote(session, unauthorized_client, token, add_fake_posts_db_multiple_users):
+    pass
