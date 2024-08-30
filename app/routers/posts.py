@@ -149,7 +149,7 @@ def update_post(
                     update:schemas.post.PostCreate, 
                     db: Session = Depends(get_db),
                     current_user: models.User = Depends(oauth2.get_current_user)
-) -> schemas.post.PostBase:
+) -> schemas.post.Post:
     # post = db.find_db_post(conn, id)
     query = db.query(models.Post).filter(models.Post.id == id)
     post = query.first()

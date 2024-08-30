@@ -1,3 +1,4 @@
+from audioop import add
 import email
 import json
 import pytest
@@ -164,3 +165,28 @@ def test_delete_not_owned_post(authorized_client, token, session, add_fake_posts
     # assert len(posts) == 2
     check = session.query(models.Post).filter(models.Post.id==post.id).first()
     assert check is not None
+
+def test_update_post(authorized_client, session, add_user_db_id1, add_fake_posts_db_userid1):
+    TITLE = 'updated'
+    CONTENT = 'up to date'
+    ID = add_fake_posts_db_userid1[0].id
+    response = authorized_client.put(
+                        f'/posts/{ID}',
+                        json={
+                            'title': TITLE,
+                            'content': CONTENT
+                        })
+    logger.debug(response.status_code)
+    assert response.status_code == 200
+    logger.debug(response.json())
+    post = schemas.post.Post(**response.json())
+    logger.debug(post)
+    assert post.title == TITLE
+    assert post.content == CONTENT
+
+    postdb = (session.query(models.Post).filter(models.Post.id==post.id).first())
+    assert postdb is not None
+    assert postdb.title == TITLE
+    assert postdb.content == CONTENT
+
+
