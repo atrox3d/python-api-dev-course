@@ -4,17 +4,18 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 import sqlalchemy
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.engine import Engine
 from sqlalchemy import event
+import logging
+
 import sqlalchemy.orm.session
 from app.main import app
-# from app.config import sqlite_settings
 from db.orm.sqlite import get_db, Base
 from tests.debug import debug
-import tests.debug
-# _debug = print
+
+logger = logging.getLogger(__name__)
+
 
 @event.listens_for(Engine, "connect")
 def set_sqlite_pragma(dbapi_connection, connection_record):
@@ -22,6 +23,10 @@ def set_sqlite_pragma(dbapi_connection, connection_record):
     ENFORCE SQLITE FOREIGN KEY
     https://stackoverflow.com/a/77708922
     '''
+    logger.debug('=' * 80)
+    logger.debug('ENFORCE SQLITE FOREIGN KEY')
+    logger.debug('https://stackoverflow.com/a/77708922')
+    logger.debug('=' * 80)
     cursor = dbapi_connection.cursor()
     cursor.execute("PRAGMA foreign_keys=ON")
     cursor.close()
@@ -35,11 +40,13 @@ def set_sqlite_pragma(dbapi_connection, connection_record):
 SQLALCHEMY_DATABASE_URL = "sqlite:///testsocial.db"
 
 # create engine, session and base pointing to test db
+logger.info('create engine')
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL, 
     connect_args={"check_same_thread": False},
     echo=False
 )
+logger.info('create TestingSessionLocal')
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 # not needed, we use the original base
@@ -60,43 +67,39 @@ TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engin
 
 @pytest.fixture
 def session() -> Generator[sqlalchemy.orm.session.Session, None, None]:
-    debug()
-    
     # prepare db for testing
-    debug(f'SESSION FIXTURE| dropping tables')
+    logger.debug(f'dropping tables')
     Base.metadata.drop_all(bind=engine)
-    debug(f'SESSION FIXTURE| creating tables')
+    logger.debug(f'creating tables')
     Base.metadata.create_all(bind=engine)
 
-    debug(f'SESSION FIXTURE| creating session')
+    logger.debug(f'creating session')
     db = TestingSessionLocal()
     try:
-        debug(f'SESSION FIXTURE| yielding session')
+        logger.debug(f'yielding session')
         db.rand = random.random()
-        debug(f'\nSESSION_FIXTURE| {db.rand = }', force=False)
+        logger.debug(f'{db.rand = }')
         yield db
     finally:
-        debug()
-        debug(f'SESSION FIXTURE| closing session')
+        logger.debug(f'SESSION FIXTURE| closing session')
         db.close()
 
 @pytest.fixture
 def unauthorized_client(session) -> Generator[TestClient, None, None]:
-    debug(f'CLIENT FIXTURE| using session fixture')
-    debug(f'\nCLIENT_FIXTURE| {session.rand = }', force=False)
+    logger.debug(f'using session fixture')
+    logger.debug(f'{session.rand = }')
     def override_get_db():
         # db = TestingSessionLocal()
         try:
-            debug(f'OVERRIDE_GET_DB| yielding session')
+            logger.debug(f'yielding session')
             yield session
         finally:
-            debug()
-            debug(f'OVERRIDE_GET_DB| closing session')
+            logger.debug(f'closing session')
             session.close()
     
-    debug(f'CLIENT FIXTURE| overriding get_db')
+    logger.debug(f'overriding get_db')
     app.dependency_overrides[get_db] = override_get_db
     
-    debug(f'CLIENT FIXTURE| yielding new test client')
+    logger.debug(f'yielding new test client')
     yield TestClient(app)
     # leave db untouched after test
