@@ -23,10 +23,10 @@ def set_sqlite_pragma(dbapi_connection, connection_record):
     ENFORCE SQLITE FOREIGN KEY
     https://stackoverflow.com/a/77708922
     '''
-    logger.debug('=' * 80)
+    # logger.debug('=' * 80)
     logger.debug('ENFORCE SQLITE FOREIGN KEY')
-    logger.debug('https://stackoverflow.com/a/77708922')
-    logger.debug('=' * 80)
+    # logger.debug('https://stackoverflow.com/a/77708922')
+    # logger.debug('=' * 80)
     cursor = dbapi_connection.cursor()
     cursor.execute("PRAGMA foreign_keys=ON")
     cursor.close()
