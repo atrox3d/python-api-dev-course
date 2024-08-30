@@ -32,7 +32,7 @@ def test_create_user(unauthorized_client, session, user_creation_json):
     assert user.email == 'testuser@gmail.com'
 
 # session fixture is cached
-def test_login(unauthorized_client, session, user_login_json, add_user_db):
+def test_login(unauthorized_client, session, user_login_json, add_user_db_id1):
     debug(f'\nTEST_LOGIN_USER| {session.rand = }', force=False)
     debug()
     debug(f'TEST_LOGIN_USER| get_user')
@@ -50,5 +50,5 @@ def test_login(unauthorized_client, session, user_login_json, add_user_db):
         token.access_token,
         app.oauth2.unhautorized_exception
     )
-    assert tokendata.id == add_user_db.id
+    assert tokendata.id == add_user_db_id1.id
 

@@ -3,7 +3,7 @@ from .fixtures.database import (
                                 unauthorized_client
 )
 from .fixtures.user import (
-                            add_user_db, 
+                            add_user_db_id1, 
                             user_creation_schema, 
                             user_creation_json, 
                             user_login_json,
@@ -14,8 +14,10 @@ from .fixtures.user import (
 
 from .fixtures.fakedata.posts import(
                             fake_posts,
-                            fake_post_models_db,
-                            add_fake_posts_db,
+                            fake_post_models_db_userid1,
+                            add_fake_posts_db_userid1,
+                            fake_post_models_db_multiple_users,
+                            add_fake_posts_db_multiple_users
 )
 
 from .fixtures.fakedata.users import(

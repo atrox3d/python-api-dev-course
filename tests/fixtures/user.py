@@ -3,6 +3,7 @@ from fastapi.testclient import TestClient
 import pytest
 import logging
 
+from db.orm import models
 import schemas, schemas.user
 from app import oauth2
 from .database import unauthorized_client
@@ -33,7 +34,7 @@ def user_login_json(user_creation_schema) -> dict[str, str]:
     }
 
 @pytest.fixture
-def add_user_db(unauthorized_client, user_creation_schema, user_creation_json) -> schemas.user.UserDb:
+def add_user_db_id1(unauthorized_client, user_creation_schema, user_creation_json) -> schemas.user.UserDb:
     ''' creates new user and return model of it from db '''
     logger.debug('creating 1st user')
     response = unauthorized_client.post(
@@ -48,9 +49,8 @@ def add_user_db(unauthorized_client, user_creation_schema, user_creation_json) -
     return userdb
 
 @pytest.fixture
-def add_users_db(request, add_user_db,  unauthorized_client, fake_users_creation_dict) -> schemas.user.UserDb:
+def add_users_db(request, session, add_user_db_id1,  unauthorized_client, fake_users_creation_dict) -> schemas.user.UserDb:
     logger.debug('creating remaining user')
-    new_users = []
     # if 'add_user_db' in request.fixturenames:
     # users = fake_users_creation_dict[1:]
     # else:
@@ -67,19 +67,20 @@ def add_users_db(request, add_user_db,  unauthorized_client, fake_users_creation
             **response.json(),
             password=user_creds['password']
         )
-        new_users.append(userdb)
-    return new_users
+    users = session.query(models.User).all()
+    return users
 
 @pytest.fixture
-def token(add_user_db) -> str:
+def token(add_user_db_id1) -> str:
     logger.debug('creating acces token')
-    return oauth2.create_access_token({'user_id': add_user_db.id})
+    return oauth2.create_access_token({'user_id': add_user_db_id1.id})
 
 @pytest.fixture
 def authorized_client(unauthorized_client, token) -> Generator[TestClient, None, None]:
     logger.debug('creating authorized client')
-    unauthorized_client.headers = {
+    authorized = unauthorized_client
+    authorized.headers = {
         **unauthorized_client.headers,
         'Authorization': f'Bearer {token}'
     }
-    yield unauthorized_client
+    yield authorized
