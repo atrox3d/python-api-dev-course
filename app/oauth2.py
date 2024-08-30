@@ -3,7 +3,7 @@ from datetime import datetime, timedelta, UTC
 from fastapi import Depends, Request, status, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
-
+import logging
 
 from db.orm import models
 from db.orm.sqlite import get_db
@@ -11,6 +11,8 @@ import schemas
 import schemas.user
 from app.config import sqlite_settings
 
+
+logger = logging.getLogger(__name__)
 # SECRET_KEY
 # alghorytm
 # expiration time
@@ -47,14 +49,14 @@ def create_access_token(data:dict):
                     ALGORITHM
     )
 
-    print(f'TOKEN|CREATE| {ACCESS_TOKEN_EXPIRE_MINUTES = }')
-    print(f'TOKEN|CREATE| {SECRET_KEY = }')
-    print(f'TOKEN|CREATE| {ALGORITHM  = }')
-    print(f'TOKEN|CREATE| {now        = }')
-    print(f'TOKEN|CREATE| {delta      = }')
-    print(f'TOKEN|CREATE| {expire     = }')
-    print(f'TOKEN|CREATE| {to_encode  = }')
-    print(f'TOKEN|CREATE| {token      = }')
+    logger.info(f'{ACCESS_TOKEN_EXPIRE_MINUTES = }')
+    logger.info(f'{SECRET_KEY = }')
+    logger.info(f'{ALGORITHM  = }')
+    logger.info(f'{now        = }')
+    logger.info(f'{delta      = }')
+    logger.info(f'{expire     = }')
+    logger.info(f'{to_encode  = }')
+    logger.info(f'{token      = }')
 
     return token
 
@@ -63,23 +65,23 @@ def verify_access_token(
                         credentials_exception:Exception
 ) -> schemas.user.TokenData:
     
-    print(f'TOKEN|VERIFY| {token    = }')
+    logger.info(f'{token    = }')
     
     try:
-        print(f'TOKEN|VERIFY| decode token')
+        logger.info(f'decode token')
         payload = jwt.decode(                  # decode token, get only payload
                         token, 
                         SECRET_KEY, 
                         algorithms=[ALGORITHM]
         )
-        print(f'TOKEN|VERIFY| {payload  = }')
+        logger.info(f'{payload  = }')
         id = payload.get('user_id')
-        print(f'TOKEN|VERIFY| {id       = }')
+        logger.info(f'{id       = }')
         if id is None:
             raise credentials_exception
         
         token_data = schemas.user.TokenData(id=id)
-        print(f'TOKEN|VERIFY| {token_data  = }')
+        logger.info(f'{token_data  = }')
 
         return token_data
 
@@ -94,7 +96,7 @@ def verify_access_token(
                 )}"
         )
     except JWTError as jwte:
-        print(f'TOKEN|VERIFY| {jwte       = }')
+        logger.exception(f'{jwte       = }')
         raise credentials_exception
 
 # create callable dependency to get token from 
@@ -119,7 +121,7 @@ def get_current_user(
         db: Session = Depends(get_db)
         # request: Request = Depends()
 ) -> models.User:
-    print(f'GET_CURRENT_USER| {oauth2_scheme.__dict__ = }')
+    logger.info(f'{oauth2_scheme.__dict__ = }')
     # print(f'GET_CURRENT_USER| {oauth2_scheme() = }')
     # print(f'GET_CURRENT_USER| create exception')
     # unhautorized = HTTPException(
@@ -128,16 +130,16 @@ def get_current_user(
     #                     headers={"WWW-Authenticate": "Bearer"},
     # )
     # https://youtu.be/0sOvCWFmrtA?si=Dh1sIirAYVL4Si4h&t=26702
-    print(f'GET_CURRENT_USER| call verify_access_token')
+    logger.info(f'call verify_access_token')
     token = verify_access_token(token, unhautorized_exception)
-    print(f'GET_CURRENT_USER| {token = }')
-    print(f'GET_CURRENT_USER| {token == 1 = }')
+    logger.info(f'{token = }')
+    logger.info(f'{token == 1 = }')
     # get user from db
     user: models.User = db.query(models.User)\
                         .filter(models.User.id == token.id)\
                         .first()
 
-    print(f'GET_CURRENT_USER| { {c.name: getattr(user, c.name) for c in user.__table__.columns} }')
+    logger.info(f'{ {c.name: getattr(user, c.name) for c in user.__table__.columns} }')
     # print(f'GET_CURRENT_USER| {schemas.user.UserDb.model_validate(user)}')
 
     return user
