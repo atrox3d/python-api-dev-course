@@ -9,7 +9,8 @@ from .fixtures.user import (
                             user_login_json,
                             token,
                             authorized_client,
-                            add_users_db
+                            add_users_db,
+                            unauthorized_client
 )
 
 from .fixtures.fakedata.posts import(

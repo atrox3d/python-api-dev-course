@@ -169,9 +169,9 @@ def test_delete_not_owned_post(authorized_client, token, session, add_fake_posts
 def test_update_post(authorized_client, session, add_user_db_id1, add_fake_posts_db_userid1):
     TITLE = 'updated'
     CONTENT = 'up to date'
-    ID = add_fake_posts_db_userid1[0].id
+    POST_ID = add_fake_posts_db_userid1[0].id
     response = authorized_client.put(
-                        f'/posts/{ID}',
+                        f'/posts/{POST_ID}',
                         json={
                             'title': TITLE,
                             'content': CONTENT
@@ -189,4 +189,46 @@ def test_update_post(authorized_client, session, add_user_db_id1, add_fake_posts
     assert postdb.title == TITLE
     assert postdb.content == CONTENT
 
+def test_update_other_user_post(authorized_client, token, session, add_fake_posts_db_multiple_users):
+    tokendata = app.oauth2.verify_access_token(token, app.oauth2.unhautorized_exception)
+    USER_ID = tokendata.id
+    post: models.Post = (
+        session.query(models.Post)
+        .filter(models.Post.owner_id!=tokendata.id)
+        .first()
+    )
+    TITLE = 'updated'
+    CONTENT = 'up to date'
+    response = authorized_client.put(
+                        f'/posts/{post.id}',
+                        json={
+                            'title': TITLE,
+                            'content': CONTENT
+                        })
+    logger.debug(response.status_code)
+    assert response.status_code == 403
 
+
+def test_unauthorized_update_post(unauthorized_client, session, add_user_db_id1, add_fake_posts_db_userid1):
+    TITLE = 'updated'
+    CONTENT = 'up to date'
+    POST_ID = add_fake_posts_db_userid1[0].id
+    response = unauthorized_client.put(
+                        f'/posts/{POST_ID}',
+                        json={
+                            'title': TITLE,
+                            'content': CONTENT
+                        })
+    logger.warn(response.status_code)
+    assert response.status_code == 401
+
+def test_update_post_not_exist(authorized_client, add_fake_posts_db_userid1):
+    TITLE = 'updated'
+    CONTENT = 'up to date'
+    response = authorized_client.put(
+                        f'/posts/-1',
+                        json={
+                            'title': TITLE,
+                            'content': CONTENT
+                        })
+    assert response.status_code == 404
