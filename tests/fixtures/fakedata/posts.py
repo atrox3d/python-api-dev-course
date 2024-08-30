@@ -35,7 +35,7 @@ def add_fake_posts_db_userid1(session, fake_post_models_db_userid1) -> list[mode
 def fake_post_models_db_multiple_users(fake_posts, add_users_db) -> list[models.Post]:
     logger.debug('returning fake Post model list')
     userids = [user.id for user in add_users_db]
-    logger.warning(f'----- {userids = } -------')
+    logger.info(f'----- {userids = } -------')
     return [models.Post(**_post.model_dump(), 
             owner_id=id) 
             for _post, id in zip(fake_posts, userids)]

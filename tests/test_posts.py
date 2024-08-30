@@ -149,3 +149,18 @@ def test_delete_owned_post(authorized_client, token, session, add_fake_posts_db_
     # assert len(posts) == 2
     check = session.query(models.Post).filter(models.Post.id==post.id).first()
     assert check is None
+
+def test_delete_not_owned_post(authorized_client, token, session, add_fake_posts_db_multiple_users):
+    tokendata = app.oauth2.verify_access_token(token, app.oauth2.unhautorized_exception)
+    post: models.Post = (
+        session.query(models.Post)
+        .filter(models.Post.owner_id!=tokendata.id)
+        .first()
+    )
+    logger.info(post.content)
+    response = authorized_client.delete(f'posts/{post.id}')
+    assert response.status_code == 403
+    # posts = session.query(models.Post).all()
+    # assert len(posts) == 2
+    check = session.query(models.Post).filter(models.Post.id==post.id).first()
+    assert check is not None
