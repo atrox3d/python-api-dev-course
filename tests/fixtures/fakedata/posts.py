@@ -2,8 +2,6 @@ import pytest
 import logging
 
 from schemas import post
-from schemas import user
-from schemas import vote
 from db.orm import models
 
 logger = logging.getLogger(__name__)
@@ -15,7 +13,6 @@ def fake_posts() -> list[post.PostCreate]:
         post.PostCreate(title='1st title', content='1st content'),
         post.PostCreate(title='2nd title', content='2nd content'),
         post.PostCreate(title='3rd title', content='3rd content'),
-        # post.PostCreate(title='4th title', content='4th content'),
     ]
 
 @pytest.fixture

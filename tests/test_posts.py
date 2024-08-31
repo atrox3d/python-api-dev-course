@@ -1,13 +1,10 @@
-from audioop import add
-import email
-import json
+from fastapi.testclient import TestClient
 import pytest
 import logging
 
-# from app.routers import posts
-from app.routers import auth
 import app.oauth2
 from db.orm import models
+from schemas.user import UserDb
 import tests.debug
 import schemas.post
 
@@ -16,15 +13,16 @@ logger = logging.getLogger(__name__)
 def  setup_module():
     tests.debug.DEBUG = False
 
-def test_get_all_posts(authorized_client, add_fake_posts_db_userid1):
+def test_get_all_posts(
+        authorized_client: TestClient, 
+        add_fake_posts_db_userid1: list[models.Post]
+):
     response = authorized_client.get('/posts')
     assert response.status_code == 200
-    # posts = [schemas.post.PostOut(**post) for post in response.json()]
-    # [print(post) for post in posts]
-    # posts = response.json()
-    print(json.dumps(response.json(), indent=2))
+
     posts = [schemas.post.Post(**post.get('Post')) for post in response.json()]
     assert len(posts) == len(add_fake_posts_db_userid1)
+    
     for post, dbpost in zip(posts, add_fake_posts_db_userid1):
         assert post.id == dbpost.id
         assert post.title == dbpost.title
@@ -33,21 +31,38 @@ def test_get_all_posts(authorized_client, add_fake_posts_db_userid1):
         assert post.created_at == dbpost.created_at
         assert post.owner_id == dbpost.owner_id
 
-def test_unauthorized_get_all_posts(unauthorized_client, add_fake_posts_db_userid1):
+def test_unauthorized_get_all_posts(
+        unauthorized_client: TestClient, 
+        add_fake_posts_db_userid1: list[models.Post]
+):
     response = unauthorized_client.get('/posts')
     assert response.status_code == 401
 
-def test_unauthorized_get_one_post(unauthorized_client, add_fake_posts_db_userid1):
-    response = unauthorized_client.get(f'/posts/{add_fake_posts_db_userid1[0].id}')
+def test_unauthorized_get_one_post(
+        unauthorized_client: TestClient, 
+        add_fake_posts_db_userid1: list[models.Post]
+):
+    response = unauthorized_client.get(
+        f'/posts/{add_fake_posts_db_userid1[0].id}'
+    )
     assert response.status_code == 401
 
-def test_get_one_posts_not_exist(authorized_client, add_fake_posts_db_userid1):
+def test_get_one_posts_not_exist(
+        authorized_client: TestClient, 
+        add_fake_posts_db_userid1: list[models.Post]
+):
     response = authorized_client.get(
-        f'/posts/-1')
+        f'/posts/-1'
+    )
     assert response.status_code == 404
 
-def test_get_one_post(authorized_client, add_fake_posts_db_userid1):
-    response = authorized_client.get(f'/posts/{add_fake_posts_db_userid1[0].id}')
+def test_get_one_post(
+        authorized_client: TestClient, 
+        add_fake_posts_db_userid1: list[models.Post]
+    ):
+    response = authorized_client.get(
+        f'/posts/{add_fake_posts_db_userid1[0].id}'
+    )
     assert response.status_code == 200
     post = schemas.post.Post(**response.json())
     assert post.id == add_fake_posts_db_userid1[0].id
@@ -61,12 +76,12 @@ def test_get_one_post(authorized_client, add_fake_posts_db_userid1):
         ]
 )
 def test_create_post(
-                    authorized_client,
-                    add_user_db_id1,
-                    add_fake_posts_db_userid1,
-                    title,
-                    content,
-                    published
+                    authorized_client: TestClient,
+                    add_user_db_id1: UserDb,
+                    add_fake_posts_db_userid1: list[models.Post],
+                    title: str,
+                    content: str,
+                    published: bool
 ):
     response = authorized_client.post(
                 'posts',
@@ -93,11 +108,11 @@ def test_create_post(
         ]
 )
 def test_create_post_default_published_true(
-                    authorized_client,
-                    add_user_db_id1,
-                    add_fake_posts_db_userid1,
-                    title,
-                    content,
+                    authorized_client: TestClient,
+                    add_user_db_id1: UserDb,
+                    add_fake_posts_db_userid1: list[models.Post],
+                    title: str,
+                    content: str,
 ):
     response = authorized_client.post(
                 'posts',
@@ -114,7 +129,7 @@ def test_create_post_default_published_true(
     assert post.owner_id == add_user_db_id1.id
     assert post.owner.email == add_user_db_id1.email
 
-def test_unauthorized_create_post(unauthorized_client):
+def test_unauthorized_create_post(unauthorized_client: TestClient):
     response = unauthorized_client.post(
                         f'/posts',
                         json=dict(
@@ -124,19 +139,33 @@ def test_unauthorized_create_post(unauthorized_client):
     )
     assert response.status_code == 401
 
-def test_unauthorized_delete_post(unauthorized_client, add_fake_posts_db_userid1):
+def test_unauthorized_delete_post(
+        unauthorized_client: TestClient, 
+        add_fake_posts_db_userid1: list[models.Post]
+):
     response = unauthorized_client.delete(f'/posts/{add_fake_posts_db_userid1[0].id}')
     assert response.status_code == 401
 
-def test_delete_post(authorized_client, add_fake_posts_db_userid1):
+def test_delete_post(
+        authorized_client: TestClient, 
+        add_fake_posts_db_userid1: list[models.Post]
+):
     response = authorized_client.delete(f'/posts/{add_fake_posts_db_userid1[0].id}')
     assert response.status_code == 204
 
-def test_delete_post_not_exist(authorized_client, add_fake_posts_db_userid1):
+def test_delete_post_not_exist(
+        authorized_client: TestClient, 
+        add_fake_posts_db_userid1: list[models.Post]
+):
     response = authorized_client.delete(f'/posts/-1')
     assert response.status_code == 404
 
-def test_delete_owned_post(authorized_client, token, session, add_fake_posts_db_multiple_users):
+def test_delete_owned_post(
+        authorized_client: TestClient, 
+        token: str, 
+        session: app.oauth2.Session, 
+        add_fake_posts_db_multiple_users: list[models.Post]
+):
     tokendata = app.oauth2.verify_access_token(token, app.oauth2.unhautorized_exception)
     post: models.Post = (
         session.query(models.Post)
@@ -146,12 +175,16 @@ def test_delete_owned_post(authorized_client, token, session, add_fake_posts_db_
     logger.info(post.content)
     response = authorized_client.delete(f'posts/{post.id}')
     assert response.status_code == 204
-    # posts = session.query(models.Post).all()
-    # assert len(posts) == 2
+    
     check = session.query(models.Post).filter(models.Post.id==post.id).first()
     assert check is None
 
-def test_delete_not_owned_post(authorized_client, token, session, add_fake_posts_db_multiple_users):
+def test_delete_not_owned_post(
+        authorized_client: TestClient, 
+        token: str, 
+        session: app.oauth2.Session, 
+        add_fake_posts_db_multiple_users: list[models.Post]
+):
     tokendata = app.oauth2.verify_access_token(token, app.oauth2.unhautorized_exception)
     post: models.Post = (
         session.query(models.Post)
@@ -161,12 +194,16 @@ def test_delete_not_owned_post(authorized_client, token, session, add_fake_posts
     logger.info(post.content)
     response = authorized_client.delete(f'posts/{post.id}')
     assert response.status_code == 403
-    # posts = session.query(models.Post).all()
-    # assert len(posts) == 2
+
     check = session.query(models.Post).filter(models.Post.id==post.id).first()
     assert check is not None
 
-def test_update_post(authorized_client, session, add_user_db_id1, add_fake_posts_db_userid1):
+def test_update_post(
+        authorized_client: TestClient, 
+        session: app.oauth2.Session, 
+        add_user_db_id1: UserDb, 
+        add_fake_posts_db_userid1: list[models.Post]
+):
     TITLE = 'updated'
     CONTENT = 'up to date'
     POST_ID = add_fake_posts_db_userid1[0].id
@@ -189,7 +226,12 @@ def test_update_post(authorized_client, session, add_user_db_id1, add_fake_posts
     assert postdb.title == TITLE
     assert postdb.content == CONTENT
 
-def test_update_other_user_post(authorized_client, token, session, add_fake_posts_db_multiple_users):
+def test_update_other_user_post(
+        authorized_client: TestClient, 
+        token: str, 
+        session: app.oauth2.Session, 
+        add_fake_posts_db_multiple_users: list[models.Post]
+):
     tokendata = app.oauth2.verify_access_token(token, app.oauth2.unhautorized_exception)
     USER_ID = tokendata.id
     post: models.Post = (
@@ -209,7 +251,12 @@ def test_update_other_user_post(authorized_client, token, session, add_fake_post
     assert response.status_code == 403
 
 
-def test_unauthorized_update_post(unauthorized_client, session, add_user_db_id1, add_fake_posts_db_userid1):
+def test_unauthorized_update_post(
+        unauthorized_client: TestClient, 
+        session: app.oauth2.Session, 
+        add_user_db_id1: UserDb, 
+        add_fake_posts_db_userid1: list[models.Post]
+):
     TITLE = 'updated'
     CONTENT = 'up to date'
     POST_ID = add_fake_posts_db_userid1[0].id
@@ -222,7 +269,10 @@ def test_unauthorized_update_post(unauthorized_client, session, add_user_db_id1,
     logger.warn(response.status_code)
     assert response.status_code == 401
 
-def test_update_post_not_exist(authorized_client, add_fake_posts_db_userid1):
+def test_update_post_not_exist(
+        authorized_client: TestClient, 
+        add_fake_posts_db_userid1: list[models.Post]
+):
     TITLE = 'updated'
     CONTENT = 'up to date'
     response = authorized_client.put(

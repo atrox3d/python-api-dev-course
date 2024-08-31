@@ -1,10 +1,6 @@
 from fastapi.testclient import TestClient
-import pytest
 import logging
 
-from schemas import post
-from schemas import user
-from schemas import vote
 from db.orm import models
 import app.oauth2
 import schemas.vote
@@ -66,7 +62,6 @@ def test_duplicate_vote(
         if post.owner_id != tokendata.id:
             break
     post_id = post.id
-    owner_id = post.owner_id
     vote = schemas.vote.Vote(post_id=post_id, dir=1)
     response = authorized_client.post(
                         '/vote',
