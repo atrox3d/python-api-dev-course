@@ -1,11 +1,6 @@
 import pytest
 import logging
 
-from schemas import post
-from schemas import user
-from schemas import vote
-from db.orm import models
-
 logger = logging.getLogger(__name__)
 
 @pytest.fixture
@@ -37,16 +32,16 @@ def fake_passwords_dict() -> list[dict[str, str]]:
 
 @pytest.fixture
 def fake_users_creation_dict(
-            fake_emails_dict,
-            fake_passwords_dict
+            fake_emails_dict:list[dict[str, str]],
+            fake_passwords_dict:list[dict[str, str]],
 ) -> list[dict[str, str]]:
     logger.debug('merging email and passwords')
     return [email | password for email, password in zip(fake_emails_dict, fake_passwords_dict)]
 
 @pytest.fixture
 def fake_users_login_dict(
-            fake_usernames_dict,
-            fake_passwords_dict
+            fake_usernames_dict:list[dict[str, str]],
+            fake_passwords_dict:list[dict[str, str]]
 ) -> list[dict[str, str]]:
     logger.debug('merging usernames and passwords')
     return [email | password for email, password in zip(fake_usernames_dict, fake_passwords_dict)]
