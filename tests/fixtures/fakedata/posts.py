@@ -20,8 +20,8 @@ def fake_posts() -> list[post.PostCreate]:
 
 @pytest.fixture
 def fake_post_models_db_userid1(
-    fake_posts:list[schemas.post.PostCreate], 
-    add_user_db_id1:schemas.user.UserDb
+    fake_posts          :list[schemas.post.PostCreate], 
+    add_user_db_id1     :schemas.user.UserDb
 ) -> list[models.Post]:
     logger.debug('returning fake Post model list')
     return [models.Post(**_post.model_dump(), owner_id=add_user_db_id1.id) 
