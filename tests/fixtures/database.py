@@ -5,6 +5,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 import sqlalchemy
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import Session
 from sqlalchemy.engine import Engine
 from sqlalchemy import event
 import logging
@@ -77,7 +78,7 @@ def session() -> Generator[sqlalchemy.orm.session.Session, None, None]:
     db = TestingSessionLocal()
     try:
         logger.debug(f'yielding session')
-        db.rand = random.random()
+        db.rand = random.random()       # check unique fixture
         logger.debug(f'{db.rand = }')
         yield db
     finally:
@@ -85,11 +86,10 @@ def session() -> Generator[sqlalchemy.orm.session.Session, None, None]:
         db.close()
 
 @pytest.fixture
-def unauthorized_client(session) -> Generator[TestClient, None, None]:
+def unauthorized_client(session:Session) -> Generator[TestClient, None, None]:
     logger.debug(f'using session fixture')
     logger.debug(f'{session.rand = }')
     def override_get_db():
-        # db = TestingSessionLocal()
         try:
             logger.debug(f'yielding session')
             yield session
